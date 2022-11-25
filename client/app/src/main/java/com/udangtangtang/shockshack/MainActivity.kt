@@ -1,8 +1,10 @@
 package com.udangtangtang.shockshack
 
+import PostGoogleToken
 import android.app.ProgressDialog.show
 import android.content.Intent
 import android.content.IntentSender
+import android.media.session.MediaSession
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -14,6 +16,11 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMainBinding
@@ -33,39 +40,47 @@ class MainActivity : AppCompatActivity() {
         // Hide Action Bar
         supportActionBar?.hide()
 
-        // Google Sign-in
-        // Configure One-tap login
-        oneTapClient=Identity.getSignInClient(this)
-        Toast.makeText(this, "help!!!!", Toast.LENGTH_SHORT).show()
-        signInRequest=BeginSignInRequest.builder()
-            .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
-                .setSupported(true)
-                .build())
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setServerClientId(getString(R.string.web_client_id))
-                    .setFilterByAuthorizedAccounts(false)
-                    .build())
-            .setAutoSelectEnabled(true)
-            .build()
+        // Normal login Button
+        binding.buttonMainLoginNormal.setOnClickListener {
+            Toast.makeText(this, "일반 로그인으로 연결", Toast.LENGTH_SHORT).show()
+        }
 
-        // Display One-tap login UI
-        oneTapClient.beginSignIn(signInRequest)
-            .addOnSuccessListener(this) { result ->
-                try {
-                    startIntentSenderForResult(
-                        result.pendingIntent.intentSender, REQ_ONE_TAP,
-                        null, 0, 0, 0)
-                } catch (e: IntentSender.SendIntentException) {
-                    Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
+        // Google login button
+        binding.buttonMainLoginGoogle.setOnClickListener {
+            // Google Sign-in
+            // Configure One-tap login
+            oneTapClient=Identity.getSignInClient(this)
+            Toast.makeText(this, "help!!!!", Toast.LENGTH_SHORT).show()
+            signInRequest=BeginSignInRequest.builder()
+                .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
+                    .setSupported(true)
+                    .build())
+                .setGoogleIdTokenRequestOptions(
+                    BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                        .setSupported(true)
+                        .setServerClientId(getString(R.string.web_client_id))
+                        .setFilterByAuthorizedAccounts(false)
+                        .build())
+                .setAutoSelectEnabled(true)
+                .build()
+
+            // Display One-tap login UI
+            oneTapClient.beginSignIn(signInRequest)
+                .addOnSuccessListener(this) { result ->
+                    try {
+                        startIntentSenderForResult(
+                            result.pendingIntent.intentSender, REQ_ONE_TAP,
+                            null, 0, 0, 0)
+                    } catch (e: IntentSender.SendIntentException) {
+                        Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
+                    }
                 }
-            }
-            .addOnFailureListener(this) { e ->
-                // No saved credentials found. Launch the One Tap sign-up flow, or
-                // do nothing and continue presenting the signed-out UI.
-                Log.d(TAG, e.localizedMessage)
-            }
+                .addOnFailureListener(this) { e ->
+                    // No saved credentials found. Launch the One Tap sign-up flow, or
+                    // do nothing and continue presenting the signed-out UI.
+                    Log.d(TAG, e.localizedMessage)
+                }
+        }
 
 
     }
@@ -83,6 +98,23 @@ class MainActivity : AppCompatActivity() {
                         idToken!=null->{
                             Log.d(TAG, "Got ID Token")
                             Log.d(TAG, idToken +"/"+ username)
+                            // Retrofit
+                            val retrofit = Retrofit.Builder().baseUrl("http://49.174.169.48:13883")
+                                .addConverterFactory(GsonConverterFactory.create()).build()
+                            val service=retrofit.create(RetrofitService::class.java)
+
+                            service.postGoogleIdToken(idToken).enqueue(object:Callback<Void> {
+                                override fun onResponse(
+                                    call: Call<Void>,
+                                    response: Response<Void>
+                                ) {
+                                    Log.d("Retrofit", "Token posted with status "+response.code().toString()+ " : " + idToken)
+                                }
+
+                                override fun onFailure(call: Call<Void>, t: Throwable) {
+                                    Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                                }
+                            })
                         }
                         password!=null->{
                             Log.d(TAG, "Got password.")
