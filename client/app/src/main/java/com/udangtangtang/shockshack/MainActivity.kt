@@ -1,6 +1,7 @@
 package com.udangtangtang.shockshack
 
 import android.app.ProgressDialog.show
+import android.content.Intent
 import android.content.IntentSender
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var oneTapClient:SignInClient
     private lateinit var signInRequest:BeginSignInRequest
     private var REQ_ONE_TAP=100
+    private var showOneTapUI=true
     private var TAG="MainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,12 +36,16 @@ class MainActivity : AppCompatActivity() {
         // Google Sign-in
         // Configure One-tap login
         oneTapClient=Identity.getSignInClient(this)
+        Toast.makeText(this, "help!!!!", Toast.LENGTH_SHORT).show()
         signInRequest=BeginSignInRequest.builder()
+            .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
+                .setSupported(true)
+                .build())
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setServerClientId(getString(R.string.web_client_id))
-                    .setFilterByAuthorizedAccounts(true)
+                    .setFilterByAuthorizedAccounts(false)
                     .build())
             .setAutoSelectEnabled(true)
             .build()
@@ -48,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     startIntentSenderForResult(
                         result.pendingIntent.intentSender, REQ_ONE_TAP,
-                        null, 0, 0, 0, null)
+                        null, 0, 0, 0)
                 } catch (e: IntentSender.SendIntentException) {
                     Log.e(TAG, "Couldn't start One Tap UI: ${e.localizedMessage}")
                 }
@@ -59,12 +67,46 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, e.localizedMessage)
             }
 
-        // Make simple toast
-        binding.button.setOnClickListener() {
-            Toast
-                .makeText(applicationContext, "Hello World!", Toast.LENGTH_SHORT)
-                .show()
-        }
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQ_ONE_TAP->{
+                try{
+                    val credential=oneTapClient.getSignInCredentialFromIntent(data)
+                    val idToken=credential.googleIdToken
+                    val username=credential.id
+                    val password=credential.password
+                    when{
+                        idToken!=null->{
+                            Log.d(TAG, "Got ID Token")
+                            Log.d(TAG, idToken +"/"+ username)
+                        }
+                        password!=null->{
+                            Log.d(TAG, "Got password.")
+                        }
+                        else ->{
+                            Log.d(TAG, "No ID token or password!")
+                        }
+                    }
+                }catch(e:ApiException){
+                    when(e.statusCode){
+                        CommonStatusCodes.CANCELED ->{
+                            Log.d(TAG, "One-tap dialog was closed.")
+                            showOneTapUI=false
+                        }
+                        CommonStatusCodes.NETWORK_ERROR->{
+                            Log.d(TAG, "One-tap encountered a network error.")
+                        }
+                        else -> {
+                            Log.d(TAG, "Couldn't get credential from result." +
+                                    " (${e.localizedMessage})")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
