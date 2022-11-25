@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
             // Google Sign-in
             // Configure One-tap login
             oneTapClient=Identity.getSignInClient(this)
-            Toast.makeText(this, "help!!!!", Toast.LENGTH_SHORT).show()
             signInRequest=BeginSignInRequest.builder()
                 .setPasswordRequestOptions(BeginSignInRequest.PasswordRequestOptions.builder()
                     .setSupported(true)
