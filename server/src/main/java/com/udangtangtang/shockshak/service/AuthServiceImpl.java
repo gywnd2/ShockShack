@@ -21,9 +21,9 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void register(AuthDto authDto) throws IllegalStateException {
-        if(validateDuplication(authDto.email())) throw new IllegalStateException("User trying to register with duplicated email");
-        ApplicationUser applicationUser = new ApplicationUser(authDto.email(), passwordEncoder.encode(authDto.password()));
+    public void register(AuthDto dto) throws IllegalStateException {
+        if(validateDuplication(dto.email())) throw new IllegalStateException("User trying to register with duplicated email");
+        ApplicationUser applicationUser = new ApplicationUser(dto.email(), passwordEncoder.encode(dto.password()), dto.userType());
         userRepository.save(applicationUser);
     }
 
