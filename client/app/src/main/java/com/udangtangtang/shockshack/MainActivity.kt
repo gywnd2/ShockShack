@@ -24,9 +24,9 @@ class MainActivity : AppCompatActivity() {
     // Google Sign-in
     private lateinit var oneTapClient:SignInClient
     private lateinit var signInRequest:BeginSignInRequest
-    private var REQ_ONE_TAP=100
+    private val REQ_ONE_TAP=100
     private var showOneTapUI=true
-    private var TAG="MainActivity"
+    private val TAG="MainActivity"
 
     // Retrofit
     private lateinit var retrofit: Retrofit
@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
                             Log.d(TAG, "Got ID Token")
                             Log.d(TAG, idToken +"/"+ username)
 
+                            // Request POST Google Idtoken to server
                             service.postGoogleIdToken(idToken).enqueue(object:Callback<Void> {
                                 override fun onResponse(
                                     call: Call<Void>,

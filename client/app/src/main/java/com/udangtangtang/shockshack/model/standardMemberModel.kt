@@ -1,3 +1,4 @@
+import android.widget.EditText
 import com.google.gson.annotations.SerializedName
 
 data class standardMemberModel(
