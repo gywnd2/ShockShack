@@ -1,5 +1,7 @@
 package com.udangtangtang.shockshak.dto;
 
-public record AuthDto(String email, String password) {
+import com.udangtangtang.shockshak.domain.ApplicationUser;
+
+public record AuthDto(String email, String password, ApplicationUser.UserType userType) {
 
 }

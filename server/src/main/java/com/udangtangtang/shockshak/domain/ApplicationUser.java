@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 
 @Entity
@@ -17,5 +19,10 @@ public class ApplicationUser {
     private String email;
     @Setter
     private String password;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
+    public enum UserType {
+        GOOGLE, STANDARD
+    }
 }
