@@ -1,15 +1,11 @@
 package com.udangtangtang.shockshack
 
-import PostGoogleToken
-import android.app.ProgressDialog.show
 import android.content.Intent
 import android.content.IntentSender
-import android.media.session.MediaSession
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -32,6 +28,10 @@ class MainActivity : AppCompatActivity() {
     private var showOneTapUI=true
     private var TAG="MainActivity"
 
+    // Retrofit
+    private lateinit var retrofit: Retrofit
+    private lateinit var service : RetrofitService
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityMainBinding.inflate(layoutInflater)
@@ -40,9 +40,21 @@ class MainActivity : AppCompatActivity() {
         // Hide Action Bar
         supportActionBar?.hide()
 
+        // Init Retrofit
+        retrofit = Retrofit.Builder().baseUrl(getString(R.string.server_addr))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        service=retrofit.create(RetrofitService::class.java)
+
         // Normal login Button
         binding.buttonMainLoginNormal.setOnClickListener {
             Toast.makeText(this, "일반 로그인으로 연결", Toast.LENGTH_SHORT).show()
+        }
+
+        // Normal Signup Button
+        binding.buttonMainSignupNormal.setOnClickListener {
+            var Intent=Intent()
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
 
         // Google login button
@@ -97,10 +109,6 @@ class MainActivity : AppCompatActivity() {
                         idToken!=null->{
                             Log.d(TAG, "Got ID Token")
                             Log.d(TAG, idToken +"/"+ username)
-                            // Retrofit
-                            val retrofit = Retrofit.Builder().baseUrl("http://49.174.169.48:13883")
-                                .addConverterFactory(GsonConverterFactory.create()).build()
-                            val service=retrofit.create(RetrofitService::class.java)
 
                             service.postGoogleIdToken(idToken).enqueue(object:Callback<Void> {
                                 override fun onResponse(

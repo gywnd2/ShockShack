@@ -2,6 +2,10 @@
     <string name="app_name">ShockShack</string>
     <string name="web_client_id">171803808918-qnc80jkj9s0gehsj273rhns3l8btvqrd.apps.googleusercontent.com</string>
     <string name="text_main_button_login_normal">쑉! 로그인</string>
+    <string name="text_main_button_signup_normal">쑉! 회원가입</string>
     <string name="text_main_input_id">아이디</string>
     <string name="text_main_input_password">비밀번호</string>
+    <string name="text_signup_title">회원가입</string>
+    <string name="text_signup_button_submit">회원가입</string>
+    <string name="server_addr">http://49.174.169.48:13883</string>
 </resources>
