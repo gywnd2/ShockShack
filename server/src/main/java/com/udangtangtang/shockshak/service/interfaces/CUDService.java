@@ -1,6 +1,6 @@
 package com.udangtangtang.shockshak.service.interfaces;
 
-public interface Service<T> {
+public interface CUDService<T> {
     void register(T t);
 
     T remove(T t);
