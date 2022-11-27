@@ -69,9 +69,7 @@ class SignUpActivity : AppCompatActivity() {
                 service.postSignUpNewUser(member).enqueue(object: Callback<Void>{
                     override fun onResponse(call: Call<Void>, response: Response<Void>) {
                         Log.d("Retrofit", "New member posted with status "+response.code().toString())
-                        // Clear activity stack and start MainActivity
-                        finishAffinity()
-                        startActivity(Intent(applicationContext, MainActivity::class.java))
+                        finish()
                     }
 
                     override fun onFailure(call: Call<Void>, t: Throwable) {
