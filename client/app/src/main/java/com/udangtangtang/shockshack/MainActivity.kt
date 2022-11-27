@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var retrofit : Retrofit
     private lateinit var service : RetrofitService
 
+    // Consider logged in from google or normal
+    private lateinit var accountType : String
     private val Google="googleToken"
     private val Normal="accessToken"
 
@@ -40,8 +42,19 @@ class MainActivity : AppCompatActivity() {
             .build()
         service=retrofit.create(RetrofitService::class.java)
 
+        // Consider logged in from google or normal
+
         // Get SharedPreferences handle
         pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
+
+        // Consider logged in from google or normal
+        if(pref.getString(Google, "null").equals("null")){
+            supportActionBar?.setTitle("Normal Account")
+            accountType=Normal }
+        else{
+            supportActionBar?.setTitle("Google Account")
+            accountType=Google }
+
         // Show test
         with(pref.edit()){
             binding.accessToken.text=pref.getString("accessToken","Null")
@@ -53,10 +66,10 @@ class MainActivity : AppCompatActivity() {
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
-            Toast.makeText(this, pref.getString(Google,"Null"), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, pref.getString(accountType,"Null"), Toast.LENGTH_SHORT).show()
             service.enterChatQueue("Bearer "+pref.getString(Normal, "Null").toString()).enqueue(object : Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    Log.d("Retrofit", "Entered queue : "+pref.getString(Google, "Null"))
+                    Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null"))
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {

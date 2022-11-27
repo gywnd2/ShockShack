@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -63,6 +64,10 @@ class LoginActivity : AppCompatActivity() {
 
         // Normal login Button
         binding.buttonLoginNormal.setOnClickListener {
+            // Hide keyboard first
+            val imm: InputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+
             // Check if email / password are null or not
             var isEmailValid=false
             var isPasswordValid=false
@@ -89,19 +94,22 @@ class LoginActivity : AppCompatActivity() {
                         response: Response<normalLoginTokenModel>
                     ) {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
-                        // Store idToken to SharedPreferences
-                        // TODO : 일반 로그인 토큰 받아와야 함
-                        Log.d("Login test", response.body()?.accessToken+" / "+response.body()?.refreshToken+" / "+binding.inputTextLoginEmail.text.toString())
-                        with(pref.edit()){
-                            remove("googleToken")
-                            putString("accessToken", response.body()?.accessToken)
-                            putString("refreshToken", response.body()?.refreshToken)
-                            putString("email", binding.inputTextLoginEmail.text.toString())
-                            apply()
+                        if (response.code().toString().equals("200")){
+                            // Store idToken to SharedPreferences
+                            with(pref.edit()){
+                                remove("googleToken")
+                                putString("accessToken", response.body()?.accessToken)
+                                putString("refreshToken", response.body()?.refreshToken)
+                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                apply()
+                            }
+                            // Start mainActivity
+                            startActivity(Intent(applicationContext, MainActivity::class.java))
+                            finish()
+                        }else{
+                            Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
                         }
-                        // Start mainActivity
-                        startActivity(Intent(applicationContext, MainActivity::class.java))
-                        finish()
+
                     }
 
                     override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
