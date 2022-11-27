@@ -13,4 +13,5 @@
     <string name="hint_signup_email_pattern_invalid">Email 형식을 확인 해주세요.</string>
     <string name="hint_signup_password_null">비밀번호를 입력해주세요.</string>
     <string name="hint_signup_post_newmember_failed">회원등록에 실패하였습니다.</string>
+    <string name="text_main_button_enqueue">입장!</string>
 </resources>

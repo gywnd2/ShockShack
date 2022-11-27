@@ -7,7 +7,4 @@ data class standardMemberModel(
 
     @SerializedName("password")
     val password: String,
-
-    @SerializedName("userType")
-    val type: String
 )

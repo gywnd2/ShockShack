@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <TextView
+        android:id="@+id/text_login_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/input_text_login_email"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteY="150dp" />
+
+    <EditText
+        android:id="@+id/input_text_login_email"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/text_main_input_id"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/text_login_title"
+        app:layout_constraintBottom_toTopOf="@id/input_text_login_password"/>
+
+    <EditText
+        android:id="@+id/input_text_login_password"
+        android:inputType="textPassword"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/text_main_input_password"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/input_text_login_email"
+        app:layout_constraintBottom_toTopOf="@id/button_login_normal"/>
+
+    <Button
+        android:id="@+id/button_login_normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_main_button_login_normal"
+        app:layout_constraintTop_toBottomOf="@id/input_text_login_password"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/button_login_signup_normal"
+        app:layout_constraintBottom_toTopOf="@id/button_login_google"/>
+
+    <Button
+        android:id="@+id/button_login_signup_normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/text_main_button_signup_normal"
+        app:layout_constraintTop_toBottomOf="@id/input_text_login_password"
+        app:layout_constraintLeft_toRightOf="@id/button_login_normal"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_login_google"/>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/button_login_google"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_login_normal"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

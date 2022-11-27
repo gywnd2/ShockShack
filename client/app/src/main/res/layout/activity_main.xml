@@ -6,67 +6,55 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <TextView
-        android:id="@+id/text_main_title"
+        android:id="@+id/accessToken"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textColor="@color/black"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/input_text_signup_email"
+        android:text="test"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteY="150dp" />
-
-    <EditText
-        android:id="@+id/input_text_signup_email"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:hint="@string/text_main_input_id"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_main_title"
-        app:layout_constraintBottom_toTopOf="@id/input_text_signup_password"/>
-
-    <EditText
-        android:id="@+id/input_text_signup_password"
-        android:inputType="textPassword"
-        android:layout_width="300dp"
+        app:layout_constraintBottom_toTopOf="@id/refreshToken"
+        />
+    <TextView
+        android:id="@+id/refreshToken"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/text_main_input_password"
+        android:text="test"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/input_text_signup_email"
-        app:layout_constraintBottom_toTopOf="@id/button_main_login_normal"/>
+        app:layout_constraintTop_toBottomOf="@id/accessToken"
+        app:layout_constraintBottom_toTopOf="@id/googletoken"
+        />
+    <TextView
+        android:id="@+id/googletoken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/refreshToken"
+        app:layout_constraintBottom_toTopOf="@id/email"
+        />
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/googletoken"
+        app:layout_constraintBottom_toTopOf="@id/button_main_enqueue"
+        />
 
     <Button
-        android:id="@+id/button_main_login_normal"
+        android:id="@+id/button_main_enqueue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/text_main_button_login_normal"
-        app:layout_constraintTop_toBottomOf="@id/input_text_signup_password"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/button_main_signup_normal"
-        app:layout_constraintBottom_toTopOf="@id/button_main_login_google"/>
-
-    <Button
-        android:id="@+id/button_main_signup_normal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_main_button_signup_normal"
-        app:layout_constraintTop_toBottomOf="@id/input_text_signup_password"
-        app:layout_constraintLeft_toRightOf="@id/button_main_login_normal"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_main_login_google"/>
-
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/button_main_login_google"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:text="@string/text_main_button_enqueue"
+        app:layout_constraintTop_toBottomOf="@id/email"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/button_main_login_normal"/>
-
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
