@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.util.Patterns
 import android.widget.Toast
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
@@ -62,31 +63,52 @@ class LoginActivity : AppCompatActivity() {
 
         // Normal login Button
         binding.buttonLoginNormal.setOnClickListener {
-            // Request POST Google Idtoken to server
-            service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
-                override fun onResponse(
-                    call: Call<normalLoginTokenModel>,
-                    response: Response<normalLoginTokenModel>
-                ) {
-                    Log.d("Retrofit", "Token posted with status "+response.code().toString())
-                    // Store idToken to SharedPreferences
-                    // TODO : 일반 로그인 토큰 받아와야 함
-                    Log.d("Login test", response.body()?.accessToken+" / "+response.body()?.refreshToken+" / "+binding.inputTextLoginEmail.text.toString())
-                    with(pref.edit()){
-                        putString("accessToken", response.body()?.accessToken)
-                        putString("refreshToken", response.body()?.refreshToken)
-                        putString("email", binding.inputTextLoginEmail.text.toString())
-                        apply()
-                    }
-                    // Start mainActivity
-                    startActivity(Intent(applicationContext, MainActivity::class.java))
-                    finish()
-                }
+            // Check if email / password are null or not
+            var isEmailValid=false
+            var isPasswordValid=false
+            if(binding.inputTextLoginEmail.text.toString().equals("")||binding.inputTextLoginEmail.text.toString()==null){
+                Toast.makeText(this, getString(R.string.hint_signup_email_null), Toast.LENGTH_SHORT).show()
+            }else{
+                // Check email pattern is valid
+                if(Patterns.EMAIL_ADDRESS.matcher(binding.inputTextLoginEmail.text.toString()).matches()){ isEmailValid=true }
+                else{
+                    Toast.makeText(this, getString(R.string.hint_signup_email_pattern_invalid), Toast.LENGTH_SHORT).show()}
 
-                override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
-                    Log.d("Retrofit", "Token post failed : " + t.message.toString())
-                }
-            })
+            }
+            if(binding.inputTextLoginPassword.text.toString().equals("")||binding.inputTextLoginPassword.text.toString()==null){
+                Toast.makeText(this, getString(R.string.hint_signup_password_null), Toast.LENGTH_SHORT).show()
+            }else{ isPasswordValid=true }
+
+            // If email/password are valid
+            if(isEmailValid && isPasswordValid)
+            {
+                // Request POST Google Idtoken to server
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
+                    override fun onResponse(
+                        call: Call<normalLoginTokenModel>,
+                        response: Response<normalLoginTokenModel>
+                    ) {
+                        Log.d("Retrofit", "Token posted with status "+response.code().toString())
+                        // Store idToken to SharedPreferences
+                        // TODO : 일반 로그인 토큰 받아와야 함
+                        Log.d("Login test", response.body()?.accessToken+" / "+response.body()?.refreshToken+" / "+binding.inputTextLoginEmail.text.toString())
+                        with(pref.edit()){
+                            remove("googleToken")
+                            putString("accessToken", response.body()?.accessToken)
+                            putString("refreshToken", response.body()?.refreshToken)
+                            putString("email", binding.inputTextLoginEmail.text.toString())
+                            apply()
+                        }
+                        // Start mainActivity
+                        startActivity(Intent(applicationContext, MainActivity::class.java))
+                        finish()
+                    }
+
+                    override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
+                        Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                    }
+                })
+            }
         }
 
         // Normal Signup Button
@@ -156,6 +178,8 @@ class LoginActivity : AppCompatActivity() {
                                     Log.d("Retrofit", "Token posted with status "+response.code().toString()+ " : " + idToken)
                                     // Store idToken to SharedPreferences
                                     with(pref.edit()){
+                                        remove("accessToken")
+                                        remove("refreshToken")
                                         putString("googleToken", idToken)
                                         putString("email", username)
                                         apply()

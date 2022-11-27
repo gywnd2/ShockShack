@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var retrofit : Retrofit
     private lateinit var service : RetrofitService
 
-    private val Google="idToken"
+    private val Google="googleToken"
     private val Normal="accessToken"
 
     private var backPressWaitTime:Long=0
@@ -53,7 +53,8 @@ class MainActivity : AppCompatActivity() {
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
-            service.enterChatQueue("Bearer "+pref.getString(Google, "Null").toString()).enqueue(object : Callback<Void>{
+            Toast.makeText(this, pref.getString(Google,"Null"), Toast.LENGTH_SHORT).show()
+            service.enterChatQueue("Bearer "+pref.getString(Normal, "Null").toString()).enqueue(object : Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.d("Retrofit", "Entered queue : "+pref.getString(Google, "Null"))
                 }
