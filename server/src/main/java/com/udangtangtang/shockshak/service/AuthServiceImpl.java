@@ -22,7 +22,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(AuthDto dto) throws IllegalStateException {
-        if(validateDuplication(dto.email())) throw new IllegalStateException("User trying to register with duplicated email");
+        if (validateDuplication(dto.email()))
+            throw new IllegalStateException("User trying to register with duplicated email");
         ApplicationUser applicationUser = new ApplicationUser(dto.email(), passwordEncoder.encode(dto.password()), dto.userType());
         userRepository.save(applicationUser);
     }
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUser applicationUser = userRepository.findById(username).orElseThrow();
+        ApplicationUser applicationUser = userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException(username + " is not available"));
         return new User(username, applicationUser.getPassword(), Collections.emptyList());
     }
 

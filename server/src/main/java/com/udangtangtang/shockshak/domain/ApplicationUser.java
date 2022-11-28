@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -24,5 +21,10 @@ public class ApplicationUser {
 
     public enum UserType {
         GOOGLE, STANDARD
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if(this.userType == null) this.userType = UserType.STANDARD;
     }
 }
