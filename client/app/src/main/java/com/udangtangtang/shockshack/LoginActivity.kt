@@ -57,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
         pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
 
         // Init Retrofit
-        retrofit = Retrofit.Builder().baseUrl(getString(R.string.server_addr))
+        retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         service=retrofit.create(RetrofitService::class.java)
@@ -136,7 +136,7 @@ class LoginActivity : AppCompatActivity() {
                 .setGoogleIdTokenRequestOptions(
                     BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                         .setSupported(true)
-                        .setServerClientId(getString(R.string.web_client_id))
+                        .setServerClientId(BuildConfig.GOOGLE_WEB_CLIENT_ID)
                         .setFilterByAuthorizedAccounts(false)
                         .build())
                 .setAutoSelectEnabled(false)
@@ -184,17 +184,23 @@ class LoginActivity : AppCompatActivity() {
                                     response: Response<Void>
                                 ) {
                                     Log.d("Retrofit", "Token posted with status "+response.code().toString()+ " : " + idToken)
-                                    // Store idToken to SharedPreferences
-                                    with(pref.edit()){
-                                        remove("accessToken")
-                                        remove("refreshToken")
-                                        putString("googleToken", idToken)
-                                        putString("email", username)
-                                        apply()
+                                    if (response.code()==200 || response.code()==400){
+                                        // Store idToken to SharedPreferences
+                                        with(pref.edit()){
+                                            remove("accessToken")
+                                            remove("refreshToken")
+                                            putString("googleToken", idToken)
+                                            putString("email", username)
+                                            apply()
+                                        }
+                                        // Start mainActivity
+                                        startActivity(Intent(applicationContext, MainActivity::class.java))
+                                        finish()
                                     }
-                                    // Start mainActivity
-                                    startActivity(Intent(applicationContext, MainActivity::class.java))
-                                    finish()
+                                    else{
+                                        Snackbar.make(binding.root, getString(R.string.text_login_google_failed), Snackbar.LENGTH_LONG).show()
+                                    }
+
                                 }
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -231,7 +237,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if(System.currentTimeMillis() - backPressWaitTime >=2000 ) {
             backPressWaitTime = System.currentTimeMillis()
-            Snackbar.make(binding.root,"뒤로가기 버튼을 한번 더 누르면 종료됩니다.",Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root,getString(R.string.text_hint_on_backpressed),Snackbar.LENGTH_LONG).show()
         } else {
             finish()
         }

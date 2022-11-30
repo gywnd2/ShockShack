@@ -1,7 +1,3 @@
-.gradle
-/build
-local.properties
-
 # Ignore Gradle GUI config
 gradle-app.setting
 
@@ -10,6 +6,23 @@ gradle-app.setting
 
 # Cache of project
 .gradletasknamecache
+
+*.iml
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+.gradle
+/build
+local.properties
+/captures
+.externalNativeBuild
+.cxx
+credentials.json
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties

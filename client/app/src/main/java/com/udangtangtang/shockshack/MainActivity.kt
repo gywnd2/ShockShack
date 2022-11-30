@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Init Retrofit
-        retrofit = Retrofit.Builder().baseUrl(getString(R.string.server_addr))
+        retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         service=retrofit.create(RetrofitService::class.java)
@@ -67,9 +67,10 @@ class MainActivity : AppCompatActivity() {
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
             Toast.makeText(this, pref.getString(accountType,"Null"), Toast.LENGTH_SHORT).show()
-            service.enterChatQueue("Bearer "+pref.getString(Normal, "Null").toString()).enqueue(object : Callback<Void>{
+            service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null"))
+                    Toast.makeText(applicationContext, response.code(), Toast.LENGTH_LONG).show()
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -83,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if(System.currentTimeMillis() - backPressWaitTime >=2000 ) {
             backPressWaitTime = System.currentTimeMillis()
-            Snackbar.make(binding.root,"뒤로가기 버튼을 한번 더 누르면 종료됩니다.", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.root,getString(R.string.text_hint_on_backpressed), Snackbar.LENGTH_LONG).show()
         } else {
             finish()
         }

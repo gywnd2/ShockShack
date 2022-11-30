@@ -1,18 +1,18 @@
 <resources>
     <string name="app_name">ShockShack</string>
-    <string name="web_client_id">171803808918-qnc80jkj9s0gehsj273rhns3l8btvqrd.apps.googleusercontent.com</string>
     <string name="text_main_button_login_normal">쑉! 로그인</string>
     <string name="text_main_button_signup_normal">쑉! 회원가입</string>
-    <string name="text_main_input_id">이메일</string>
+    <string name="text_main_input_id">이메일z</string>
     <string name="text_main_input_password">비밀번호</string>
     <string name="text_signup_title">회원가입</string>
     <string name="text_signup_button_submit">회원가입</string>
     <string name="text_signup_input_email">이메일</string>
-    <string name="server_addr">http://49.174.169.48:13883</string>
     <string name="hint_signup_email_null">Email을 입력 해주세요.</string>
     <string name="hint_signup_email_pattern_invalid">Email 형식을 확인 해주세요.</string>
     <string name="hint_signup_password_null">비밀번호를 입력해주세요.</string>
     <string name="hint_signup_post_newmember_failed">회원등록에 실패하였습니다.</string>
     <string name="text_main_button_enqueue">입장!</string>
     <string name="text_login_input_invalid">존재하지 않는 아이디이거나, 비밀번호가 올바르지 않습니다.</string>
+    <string name="text_login_google_failed">로그인에 실패하였습니다. 서버 연결 상태를 확인하세요.</string>
+    <string name="text_hint_on_backpressed">뒤로가기 버튼을 한번 더 누르면 종료됩니다.</string>
 </resources>

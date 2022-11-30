@@ -3,6 +3,9 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
 android {
     namespace 'com.udangtangtang.shockshack'
     compileSdk 32
@@ -15,6 +18,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", properties['web_client_id']
+        buildConfigField "String", "SERVER_ADDRESS", properties['server_addr']
     }
 
     buildTypes {
@@ -53,4 +59,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.6.0'
+
+    // CircleImageView
+
 }

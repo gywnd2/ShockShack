@@ -35,7 +35,7 @@ class SignUpActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Init Retrofit
-        retrofit=Retrofit.Builder().baseUrl(getString(R.string.server_addr))
+        retrofit=Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         service=retrofit.create(RetrofitService::class.java)

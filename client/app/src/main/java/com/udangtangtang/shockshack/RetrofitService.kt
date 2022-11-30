@@ -16,6 +16,6 @@ interface RetrofitService {
     @POST("api/v1/auth/login")
     fun normalLogin(@Field("email") email:String, @Field("password") password:String): Call<normalLoginTokenModel>
 
-    @POST("api/v1/queue/enter")
+    @POST("api/v1/queue/join")
     fun enterChatQueue(@Header("Authorization") token : String):Call<Void>
 }
