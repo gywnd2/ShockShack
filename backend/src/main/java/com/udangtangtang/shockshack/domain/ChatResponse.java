@@ -12,10 +12,6 @@ public class ChatResponse {
     private String chatRoomId;
     private String sessionId;
 
-
-
-
-
     public enum ResponseResult{
         SUCCESS, CANCEL, TIMEOUT
     }

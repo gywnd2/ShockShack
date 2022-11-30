@@ -6,8 +6,8 @@ import com.udangtangtang.shockshack.domain.ChatResponse;
 import com.udangtangtang.shockshack.domain.ChatResponse.ResponseResult;
 import com.udangtangtang.shockshack.domain.MessageType;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -22,15 +22,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class QueueingService {
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     private Map<ChatRequest, DeferredResult<ChatResponse>> waitingUsers;
-    // {key : websocket session id, value : chat room id}
     private Map<String, String> connectedUsers;
     private ReentrantReadWriteLock lock;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @PostConstruct
     private void setUp() {
@@ -75,7 +74,7 @@ public class QueueingService {
 
     public void establishChatRoom() {
         try {
-            log.debug("Current waiting users : " + waitingUsers.size());
+            log.info("Current waiting users : " + waitingUsers.size());
             lock.readLock().lock();
             if (waitingUsers.size() < 2) {
                 return;
@@ -84,6 +83,7 @@ public class QueueingService {
             Iterator<ChatRequest> itr = waitingUsers.keySet().iterator();
             ChatRequest user1 = itr.next();
             ChatRequest user2 = itr.next();
+            log.info("user1 : {}, user2 : {}", user1, user2);
 
             String uuid = UUID.randomUUID().toString();
 
@@ -117,7 +117,7 @@ public class QueueingService {
     }
 
     private String getDestination(String chatRoomId) {
-        return "/topic/chat/" + chatRoomId;
+        return "/topic/" + chatRoomId;
     }
 
     private void setJoinResult(DeferredResult<ChatResponse> result, ChatResponse response) {

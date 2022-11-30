@@ -34,8 +34,8 @@ public class SecurityConfig {
                 .addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(authenticationFilter)
                 .authorizeHttpRequests()
-                    .requestMatchers("/api/v1/auth/**").permitAll()
-                    .anyRequest().authenticated();
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .anyRequest().permitAll();
         return http.build();
     }
 

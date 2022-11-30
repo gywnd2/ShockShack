@@ -26,7 +26,12 @@ public class QueueingController {
         log.info("sessionId : {}", sessionId);
         DeferredResult<ChatResponse> joinResult = new DeferredResult<>(15000L);
 
-        queueingService.joinChatRoom(new ChatRequest(sessionId), joinResult);
+        ChatRequest chatRequest = new ChatRequest(sessionId);
+        queueingService.joinChatRoom(chatRequest, joinResult);
+        joinResult.onTimeout(()->{
+            log.info("session {} timeout", sessionId);
+            queueingService.cancelChatRoom(chatRequest);
+        });
         return joinResult;
     }
 
