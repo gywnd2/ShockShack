@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
+import com.udangtangtang.shockshack.model.joinQueueResponseModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,6 +16,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
+    // TODO : Encrypt SharedPreferences, Check normal login token expires
+
     private lateinit var binding:ActivityMainBinding
 
     // SharedPreferences
@@ -60,20 +63,20 @@ class MainActivity : AppCompatActivity() {
             binding.accessToken.text=pref.getString("accessToken","Null")
             binding.refreshToken.text=pref.getString("refreshToken", "Null")
             binding.googletoken.text=pref.getString("googleToken", "Null")
-            binding.email.text=pref.getString("email","Null")
+            binding.email.text=pref.getString("tokenIssuedDateTime","Null")
         }
         Snackbar.make(binding.root, "환영합니다 "+pref.getString("email", "Null")+" 님!", Snackbar.LENGTH_LONG).show()
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
             Toast.makeText(this, pref.getString(accountType,"Null"), Toast.LENGTH_SHORT).show()
-            service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<Void>{
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<joinQueueResponseModel>{
+                override fun onResponse(call: Call<joinQueueResponseModel>, response: Response<joinQueueResponseModel>) {
                     Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null"))
-                    Toast.makeText(applicationContext, response.code(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, "responseResult :"+response.body()?.res+"\nchatRoomId : "+response.body()?.roomId+"\nsessionId : "+response.body()?.sessionId, Toast.LENGTH_LONG).show()
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<joinQueueResponseModel>, t: Throwable) {
                     Log.d("Retrofit", "Failed to enter queue")
                 }
 

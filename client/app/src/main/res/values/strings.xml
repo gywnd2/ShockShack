@@ -2,7 +2,7 @@
     <string name="app_name">ShockShack</string>
     <string name="text_main_button_login_normal">쑉! 로그인</string>
     <string name="text_main_button_signup_normal">쑉! 회원가입</string>
-    <string name="text_main_input_id">이메일z</string>
+    <string name="text_main_input_id">이메일</string>
     <string name="text_main_input_password">비밀번호</string>
     <string name="text_signup_title">회원가입</string>
     <string name="text_signup_button_submit">회원가입</string>
@@ -15,4 +15,5 @@
     <string name="text_login_input_invalid">존재하지 않는 아이디이거나, 비밀번호가 올바르지 않습니다.</string>
     <string name="text_login_google_failed">로그인에 실패하였습니다. 서버 연결 상태를 확인하세요.</string>
     <string name="text_hint_on_backpressed">뒤로가기 버튼을 한번 더 누르면 종료됩니다.</string>
+    <string name="token_datetime_format">yyyy-MM-dd HH:mm:ss</string>
 </resources>

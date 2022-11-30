@@ -1,5 +1,6 @@
 package com.udangtangtang.shockshack
 
+import com.udangtangtang.shockshack.model.joinQueueResponseModel
 import com.udangtangtang.shockshack.model.normalLoginTokenModel
 import standardMemberModel
 import retrofit2.Call
@@ -17,5 +18,5 @@ interface RetrofitService {
     fun normalLogin(@Field("email") email:String, @Field("password") password:String): Call<normalLoginTokenModel>
 
     @POST("api/v1/queue/join")
-    fun enterChatQueue(@Header("Authorization") token : String):Call<Void>
+    fun enterChatQueue(@Header("Authorization") token : String):Call<joinQueueResponseModel>
 }

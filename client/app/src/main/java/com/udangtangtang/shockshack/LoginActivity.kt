@@ -17,14 +17,14 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityLoginBinding
-import com.udangtangtang.shockshack.databinding.ActivityMainBinding
 import com.udangtangtang.shockshack.model.normalLoginTokenModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import standardMemberModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding : ActivityLoginBinding
@@ -98,6 +98,10 @@ class LoginActivity : AppCompatActivity() {
                             // Store idToken to SharedPreferences
                             with(pref.edit()){
                                 remove("googleToken")
+                                // TODO : 토큰 만료 확인
+                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(
+                                    Date(System.currentTimeMillis())
+                                ))
                                 putString("accessToken", response.body()?.accessToken)
                                 putString("refreshToken", response.body()?.refreshToken)
                                 putString("email", binding.inputTextLoginEmail.text.toString())
