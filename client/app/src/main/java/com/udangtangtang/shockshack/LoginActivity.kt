@@ -96,17 +96,42 @@ class LoginActivity : AppCompatActivity() {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
                         if (response.code().toString().equals("200")){
                             // Store idToken to SharedPreferences
-                            with(pref.edit()){
-                                remove("googleToken")
-                                // TODO : 토큰 만료 확인
-                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(
-                                    Date(System.currentTimeMillis())
-                                ))
-                                putString("accessToken", response.body()?.accessToken)
-                                putString("refreshToken", response.body()?.refreshToken)
-                                putString("email", binding.inputTextLoginEmail.text.toString())
-                                apply()
-                            }
+                            // Get token to check whether vaild or not
+                            // If token not exist
+                            // Receive token from server
+                            if (pref.getString("tokenIssuedDateTime", "null").equals("null")) {
+                                with(pref.edit()) {
+                                    remove("googleToken")
+                                    // TODO : 토큰 만료 확인
+                                    putString(
+                                        "tokenIssuedDateTime",
+                                        SimpleDateFormat(getString(R.string.token_datetime_format)).format(
+                                            Date(System.currentTimeMillis())
+                                        )
+                                    )
+                                    putString("accessToken", response.body()?.accessToken)
+                                    putString("refreshToken", response.body()?.refreshToken)
+                                    putString("email", binding.inputTextLoginEmail.text.toString())
+                                    apply()
+                                }
+                                // If token exist
+                                }else{
+                                    val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                    val tokenIssed=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
+
+                                    val diff=(now.time-tokenIssed.time)
+                                    val diffDays=(diff/1000)/(24*60*60)
+                                    val diffHour=diff/(60*60*1000)
+
+                                    // Check accessToken first
+                                    if (diffHour>=1){
+                                        Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
+                                    }else if(diffDays>=1){
+                                        Toast.makeText(applicationContext, "refreshToken expired", Toast.LENGTH_SHORT).show()
+                                    }else{
+                                        Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             // Start mainActivity
                             startActivity(Intent(applicationContext, MainActivity::class.java))
                             finish()
