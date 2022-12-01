@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Hide Action Bar
-        supportActionBar?.hide()
+//        supportActionBar?.hide()
 
         // Get SharedPreferences handle
         pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
@@ -61,6 +61,67 @@ class LoginActivity : AppCompatActivity() {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         service=retrofit.create(RetrofitService::class.java)
+
+        // Auto login
+        if (pref.getString("tokenIssuedDateTime", "null").equals("null")) {
+            // No action to make user login
+        // If token exist
+        }else{
+            val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+            val tokenIssed=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
+
+            val diff=(now.time-tokenIssed.time)
+            val diffDays=(diff/1000)/(24*60*60)
+            val diffHour=diff/(60*60*1000)
+
+            // Check accessToken first
+            if(diffDays>=1){
+                // User have to login again
+                Toast.makeText(applicationContext, pref.getString("tokenIssuedDateTime", "null"), Toast.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, getString(R.string.text_login_session_expired), Snackbar.LENGTH_LONG).show()
+            }else if (diffHour>=1){
+                // Request token to server
+                Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
+                // Request POST Google Idtoken to server
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
+                    override fun onResponse(
+                        call: Call<normalLoginTokenModel>,
+                        response: Response<normalLoginTokenModel>
+                    ) {
+                        Log.d("Retrofit", "Token posted with status "+response.code().toString())
+                        if (response.code().toString().equals("200")){
+                            // Store idToken to SharedPreferences
+                            with(pref.edit()){
+                                remove("googleToken")
+                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString("accessToken", response.body()?.accessToken)
+                                putString("refreshToken", response.body()?.refreshToken)
+                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                apply()
+                            }
+                            // Start mainActivity
+                            startActivity(Intent(applicationContext, MainActivity::class.java))
+                            finish()
+                        }else{
+                            Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
+                        }
+
+                    }
+
+                    override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
+                        Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                        Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
+                    }
+                })
+            }
+            else{
+                // Both tokens are valid
+                Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
+                // Start mainActivity
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+                finish()
+            }
+        }
 
         // Normal login Button
         binding.buttonLoginNormal.setOnClickListener {
@@ -96,53 +157,24 @@ class LoginActivity : AppCompatActivity() {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
                         if (response.code().toString().equals("200")){
                             // Store idToken to SharedPreferences
-                            // Get token to check whether vaild or not
-                            // If token not exist
-                            // Receive token from server
-                            if (pref.getString("tokenIssuedDateTime", "null").equals("null")) {
-                                with(pref.edit()) {
-                                    remove("googleToken")
-                                    // TODO : 토큰 만료 확인
-                                    putString(
-                                        "tokenIssuedDateTime",
-                                        SimpleDateFormat(getString(R.string.token_datetime_format)).format(
-                                            Date(System.currentTimeMillis())
-                                        )
-                                    )
-                                    putString("accessToken", response.body()?.accessToken)
-                                    putString("refreshToken", response.body()?.refreshToken)
-                                    putString("email", binding.inputTextLoginEmail.text.toString())
-                                    apply()
-                                }
-                                // If token exist
-                                }else{
-                                    val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
-                                    val tokenIssed=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
-
-                                    val diff=(now.time-tokenIssed.time)
-                                    val diffDays=(diff/1000)/(24*60*60)
-                                    val diffHour=diff/(60*60*1000)
-
-                                    // Check accessToken first
-                                    if (diffHour>=1){
-                                        Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
-                                    }else if(diffDays>=1){
-                                        Toast.makeText(applicationContext, "refreshToken expired", Toast.LENGTH_SHORT).show()
-                                    }else{
-                                        Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
+                            with(pref.edit()){
+                                remove("googleToken")
+                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString("accessToken", response.body()?.accessToken)
+                                putString("refreshToken", response.body()?.refreshToken)
+                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                apply()
+                            }
                             // Start mainActivity
                             startActivity(Intent(applicationContext, MainActivity::class.java))
                             finish()
                         }else{
                             Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
                         }
-
                     }
-
                     override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
                         Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                        Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                     }
                 })
             }

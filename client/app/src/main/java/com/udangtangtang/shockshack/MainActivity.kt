@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
 import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
@@ -39,6 +40,11 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Hide ActionBar
+//        supportActionBar?.hide()
+        // Set ToolBar
+        setSupportActionBar(binding.toolbarMain)
+
         // Init Retrofit
         retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
@@ -57,6 +63,11 @@ class MainActivity : AppCompatActivity() {
         else{
             supportActionBar?.setTitle("Google Account")
             accountType=Google }
+
+        // Show Profile
+        binding.textMainProfileEmail.text=pref.getString("email", "null")
+        if (accountType==Google) {binding.textMainProfileUsertype.text="Google Account"}
+        else {binding.textMainProfileUsertype.text="Normal Account"}
 
         // Show test
         with(pref.edit()){
@@ -91,5 +102,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             finish()
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 }
