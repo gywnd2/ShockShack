@@ -4,100 +4,95 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar_main"
-        android:background="?attr/colorPrimary"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/layout_main_drawer"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        android:layout_height="match_parent">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/drawable_main_profile"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/common_google_signin_btn_icon_dark"
-        app:civ_border_color="@color/black"
-        app:civ_border_width="5dp"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_main"
-        app:layout_constraintBottom_toTopOf="@id/accessToken"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/text_main_profile_email"
-        />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/text_main_profile_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@id/drawable_main_profile"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_main"
-        app:layout_constraintBottom_toTopOf="@id/text_main_profile_usertype"
-        />
+            <include
+                android:id="@+id/toolbar_main"
+                layout="@layout/layout_toolbar_main"/>
 
-    <TextView
-        android:id="@+id/text_main_profile_usertype"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toRightOf="@id/drawable_main_profile"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/accessToken"
-        app:layout_constraintTop_toBottomOf="@id/text_main_profile_email"
-        />
 
-    <TextView
-        android:id="@+id/accessToken"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        app:layout_constraintTop_toBottomOf="@id/drawable_main_profile"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/refreshToken"
-        />
-    <TextView
-        android:id="@+id/refreshToken"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/accessToken"
-        app:layout_constraintBottom_toTopOf="@id/googletoken"
-        />
-    <TextView
-        android:id="@+id/googletoken"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/refreshToken"
-        app:layout_constraintBottom_toTopOf="@id/email"
-        />
-    <TextView
-        android:id="@+id/email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/googletoken"
-        app:layout_constraintBottom_toTopOf="@id/button_main_enqueue"
-        />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/button_main_enqueue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/text_main_button_enqueue"
-        app:layout_constraintTop_toBottomOf="@id/email"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+                <TextView
+                    android:id="@+id/accessToken"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/refreshToken"
+                    />
+                <TextView
+                    android:id="@+id/refreshToken"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/accessToken"
+                    app:layout_constraintBottom_toTopOf="@id/googletoken"
+                    />
+                <TextView
+                    android:id="@+id/googletoken"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/refreshToken"
+                    app:layout_constraintBottom_toTopOf="@id/email"
+                    />
+                <TextView
+                    android:id="@+id/email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="test"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/googletoken"
+                    app:layout_constraintBottom_toTopOf="@id/button_main_enqueue"
+                    />
+                <Button
+                    android:id="@+id/button_main_enqueue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_main_button_enqueue"
+                    app:layout_constraintTop_toBottomOf="@id/email"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"/>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            app:headerLayout="@layout/drawer_main_header"
+            app:menu="@menu/drawer_main_navigation"
+            android:fitsSystemWindows="false"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_main_drawer_header"
+    android:layout_height="250dp"
+    android:layout_width="match_parent"
+    android:background="@color/ic_banner_background"
+    android:foreground="@drawable/ic_banner_foreground"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/drawable_main_drawer_header_profile"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_baseline_contactless_24"
+            app:civ_border_color="@color/black"
+            app:civ_border_width="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            />
+
+        <TextView
+            android:id="@+id/text_main_drawer_header_profile_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="email"
+            android:textSize="25dp"
+            android:textColor="@color/black"
+            android:layout_above="@id/text_main_drawer_header_profile_usertype"
+            android:layout_toRightOf="@id/drawable_main_drawer_header_profile"
+            />
+
+        <TextView
+            android:id="@+id/text_main_drawer_header_profile_usertype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="usertype"
+            android:textColor="@color/black"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/drawable_main_drawer_header_profile"
+            />
+
+        <ImageButton
+            android:id="@+id/button_main_toolbar_close"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:background="@drawable/ic_baseline_close_24"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+</LinearLayout>
+

@@ -18,4 +18,5 @@
     <string name="token_datetime_format">yyyy-MM-dd HH:mm:ss</string>
     <string name="text_login_check_connection">인터넷 연결 상태를 확인하세요.</string>
     <string name="text_login_session_expired">세션이 만료되었습니다.</string>
+    <string name="text_menu_main_drawer">로그아웃</string>
 </resources>

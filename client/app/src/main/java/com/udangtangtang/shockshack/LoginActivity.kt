@@ -266,6 +266,7 @@ class LoginActivity : AppCompatActivity() {
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
                                     Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                                    Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                                 }
                             })
                         }
