@@ -1,6 +1,7 @@
 package com.udangtangtang.shockshack
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
@@ -56,6 +57,17 @@ class MainActivity : AppCompatActivity() {
         // NavigationView
         binding.navigationMain.setNavigationItemSelectedListener {
             when (it.itemId) {
+                R.id.menu_main_drawer_logout -> {
+                    // Remove token
+                    with(pref.edit()){
+                        putString(getString(R.string.pref_checkbox_autologin), "false")
+                        apply()
+                    }
+                    startActivity(Intent(applicationContext, LoginActivity::class.java))
+                    Toast.makeText(applicationContext, getString(R.string.text_main_logout), Toast.LENGTH_LONG).show()
+                    this.finish()
+                    true
+                }
                 R.id.aa -> {
                     Toast.makeText(applicationContext, "Menu 1", Toast.LENGTH_SHORT).show()
                     true
@@ -77,13 +89,11 @@ class MainActivity : AppCompatActivity() {
 
         // Drawer open/close Button
         binding.toolbarMain.root.findViewById<ImageButton>(R.id.button_main_toolbar_open).setOnClickListener {
-            Toast.makeText(applicationContext, "open", Toast.LENGTH_SHORT).show()
             binding.layoutMainDrawer.openDrawer(GravityCompat.START)
         }
 
 
         binding.navigationMain.getHeaderView(0).findViewById<ImageButton>(R.id.button_main_toolbar_close).setOnClickListener {
-            Toast.makeText(applicationContext, "close", Toast.LENGTH_SHORT).show()
             binding.layoutMainDrawer.closeDrawer(GravityCompat.START)
         }
 

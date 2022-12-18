@@ -54,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
 //        supportActionBar?.hide()
 
         // Get SharedPreferences handle
-        pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
+        pref=this.getSharedPreferences(getString(R.string.pref_name_login), Context.MODE_PRIVATE)
 
         // Init Retrofit
         retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
@@ -62,22 +62,38 @@ class LoginActivity : AppCompatActivity() {
             .build()
         service=retrofit.create(RetrofitService::class.java)
 
-        // Auto login
-        if (pref.getString("tokenIssuedDateTime", "null").equals("null")) {
-            // No action to make user login
-        // If token exist
-        }else{
-            val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
-            val tokenIssed=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
+        // Auto login checkbox
+        if(pref.getString(getString(R.string.pref_checkbox_autologin), "false").equals("false")){
+            binding.checkboxLoginAutologin.isChecked = false
+        }else{ binding.checkboxLoginAutologin.isChecked=true }
 
-            val diff=(now.time-tokenIssed.time)
+        // Update value of sharedpreferences when checkbox changed
+        binding.checkboxLoginAutologin.setOnCheckedChangeListener{_,isChecked ->
+            if(isChecked) {
+                with(pref.edit()) {
+                    putString(getString(R.string.pref_checkbox_autologin), "true")
+                    apply()
+                }
+            }else{
+                with(pref.edit()) {
+                    putString(getString(R.string.pref_checkbox_autologin), "false")
+                    apply()
+                }
+            }
+        }
+
+        if(binding.checkboxLoginAutologin.isChecked){
+            val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+            val tokenIssued=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
+
+            val diff=(now.time-tokenIssued.time)
             val diffDays=(diff/1000)/(24*60*60)
             val diffHour=diff/(60*60*1000)
 
             // Check accessToken first
             if(diffDays>=1){
                 // User have to login again
-                Toast.makeText(applicationContext, pref.getString("tokenIssuedDateTime", "null"), Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, pref.getString(getString(R.string.pref_token_issued_date), "null"), Toast.LENGTH_SHORT).show()
                 Snackbar.make(binding.root, getString(R.string.text_login_session_expired), Snackbar.LENGTH_LONG).show()
             }else if (diffHour>=1){
                 // Request token to server
@@ -92,11 +108,11 @@ class LoginActivity : AppCompatActivity() {
                         if (response.code().toString().equals("200")){
                             // Store idToken to SharedPreferences
                             with(pref.edit()){
-                                remove("googleToken")
-                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
-                                putString("accessToken", response.body()?.accessToken)
-                                putString("refreshToken", response.body()?.refreshToken)
-                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                remove(getString(R.string.pref_token_google))
+                                putString(getString(R.string.pref_token_issued_date), SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString(getString(R.string.pref_token_normal_access), response.body()?.accessToken)
+                                putString(getString(R.string.pref_token_normal_refresh), response.body()?.refreshToken)
+                                putString(getString(R.string.pref_token_normal_email), binding.inputTextLoginEmail.text.toString())
                                 apply()
                             }
                             // Start mainActivity
@@ -121,6 +137,8 @@ class LoginActivity : AppCompatActivity() {
                 startActivity(Intent(applicationContext, MainActivity::class.java))
                 finish()
             }
+        }else{
+            // Login manually
         }
 
         // Normal login Button
@@ -158,11 +176,11 @@ class LoginActivity : AppCompatActivity() {
                         if (response.code().toString().equals("200")){
                             // Store idToken to SharedPreferences
                             with(pref.edit()){
-                                remove("googleToken")
-                                putString("tokenIssuedDateTime", SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
-                                putString("accessToken", response.body()?.accessToken)
-                                putString("refreshToken", response.body()?.refreshToken)
-                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                remove(getString(R.string.pref_token_google))
+                                putString(getString(R.string.pref_token_issued_date), SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString(getString(R.string.pref_token_normal_access), response.body()?.accessToken)
+                                putString(getString(R.string.pref_token_normal_refresh), response.body()?.refreshToken)
+                                putString(getString(R.string.pref_token_normal_email), binding.inputTextLoginEmail.text.toString())
                                 apply()
                             }
                             // Start mainActivity
@@ -248,10 +266,10 @@ class LoginActivity : AppCompatActivity() {
                                     if (response.code()==200 || response.code()==400){
                                         // Store idToken to SharedPreferences
                                         with(pref.edit()){
-                                            remove("accessToken")
-                                            remove("refreshToken")
-                                            putString("googleToken", idToken)
-                                            putString("email", username)
+                                            remove(getString(R.string.pref_token_normal_access))
+                                            remove(getString(R.string.pref_token_normal_refresh))
+                                            putString(getString(R.string.pref_token_google), idToken)
+                                            putString(getString(R.string.pref_token_normal_email), username)
                                             apply()
                                         }
                                         // Start mainActivity

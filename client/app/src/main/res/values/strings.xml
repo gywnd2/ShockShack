@@ -19,4 +19,12 @@
     <string name="text_login_check_connection">인터넷 연결 상태를 확인하세요.</string>
     <string name="text_login_session_expired">세션이 만료되었습니다.</string>
     <string name="text_menu_main_drawer">로그아웃</string>
+    <string name="pref_token_issued_date">tokenIssuedDateTime</string>
+    <string name="pref_token_google">googleToken</string>
+    <string name="pref_token_normal_access">accessToken</string>
+    <string name="pref_token_normal_refresh">refreshToken</string>
+    <string name="pref_token_normal_email">email</string>
+    <string name="pref_name_login">loginInfo</string>
+    <string name="pref_checkbox_autologin">isAutoLoginEnabled</string>
+    <string name="text_main_logout">로그아웃 되었습니다.</string>
 </resources>
