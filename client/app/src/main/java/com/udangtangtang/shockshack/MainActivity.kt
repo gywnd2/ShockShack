@@ -133,15 +133,21 @@ class MainActivity : AppCompatActivity() {
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
-            Toast.makeText(this, pref.getString(accountType,"Null"), Toast.LENGTH_SHORT).show()
             service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<joinQueueResponseModel>{
                 override fun onResponse(call: Call<joinQueueResponseModel>, response: Response<joinQueueResponseModel>) {
-                    Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null"))
-                    Toast.makeText(applicationContext, "responseResult :"+response.body()?.res+"\nchatRoomId : "+response.body()?.roomId+"\nsessionId : "+response.body()?.sessionId, Toast.LENGTH_LONG).show()
+                    Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null")+"Response code : "+ response.code().toString())
+                    // Enter chat room with chatroomid and sender session id
+                    if (response.code().toString().equals("200")) { startActivity(Intent(applicationContext, ChatActivity::class.java)
+                        .putExtra("chatRoomId", response.body()?.roomId)
+                        .putExtra("senderSessionId", response.body()?.sessionId)) }
+                    else if (response.code().toString().equals("408")) { Snackbar.make(binding.root, getString(R.string.text_main_no_chat_user), Snackbar.LENGTH_LONG).show() }
+                    else { Snackbar.make(binding.root, getString(R.string.text_main_enter_queue_failed), Snackbar.LENGTH_LONG).show() }
                 }
 
+                // If there's no user to chat or connection failure
                 override fun onFailure(call: Call<joinQueueResponseModel>, t: Throwable) {
-                    Log.d("Retrofit", "Failed to enter queue")
+                    Snackbar.make(binding.root, getString(R.string.text_main_enter_queue_failed), Snackbar.LENGTH_LONG).show()
+                    Log.d("Retrofit", "Failed to enter queue : "+t.message.toString())
                 }
 
             })
@@ -160,7 +166,6 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
-
 
     }
 

@@ -27,4 +27,10 @@
     <string name="pref_name_login">loginInfo</string>
     <string name="pref_checkbox_autologin">isAutoLoginEnabled</string>
     <string name="text_main_logout">로그아웃 되었습니다.</string>
+    <string name="text_chat_chatroomid_receive_failed">상대방과 연결에 실패했습니다. 다시 시도 해주세요.</string>
+    <string name="text_chat_input_hint">메시지를 입력하세요.</string>
+    <string name="text_chat_button_send">전송</string>
+    <string name="text_main_enter_queue_failed">서버 연결에 실패하였습니다.</string>
+    <string name="text_main_no_chat_user">상대를 찾을 수 없습니다.</string>
+    <string name="text_chat_title">채팅</string>
 </resources>

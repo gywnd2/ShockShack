@@ -50,8 +50,13 @@ class LoginActivity : AppCompatActivity() {
         binding=ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Button for test
+        binding.testbutton.setOnClickListener {
+            startActivity(Intent(applicationContext, ChatActivity::class.java))
+        }
+
         // Hide Action Bar
-//        supportActionBar?.hide()
+        supportActionBar?.hide()
 
         // Get SharedPreferences handle
         pref=this.getSharedPreferences(getString(R.string.pref_name_login), Context.MODE_PRIVATE)
