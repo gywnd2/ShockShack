@@ -14,7 +14,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +30,6 @@ import java.util.List;
 @Slf4j
 public class AuthorizationFilter extends OncePerRequestFilter {
 
-    @SneakyThrows
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (request.getServletPath().equals("/api/v1/auth/login")) {
@@ -55,7 +54,12 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
                             .setAudience(List.of("171803808918-qnc80jkj9s0gehsj273rhns3l8btvqrd.apps.googleusercontent.com"))
                             .build();
-                    GoogleIdToken idToken = verifier.verify(token);
+                    GoogleIdToken idToken = null;
+                    try {
+                        idToken = verifier.verify(token);
+                    } catch (GeneralSecurityException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     if (idToken != null) {
                         GoogleIdToken.Payload payload = idToken.getPayload();
                         String email = payload.getEmail();
@@ -65,6 +69,8 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request, response);
                     }
                 } catch (JWTVerificationException e) {
+                    log.error("{}", e.getMessage());
+                    e.printStackTrace();
                     response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
             } else {

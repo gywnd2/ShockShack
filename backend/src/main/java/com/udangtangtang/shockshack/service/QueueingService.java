@@ -8,8 +8,11 @@ import com.udangtangtang.shockshack.domain.MessageType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -41,6 +44,7 @@ public class QueueingService {
     @Async("asyncThreadPool")
     public void joinChatRoom(ChatRequest request, DeferredResult<ChatResponse> deferredResult) {
         log.info("## Join chat room request. {}[{}]", Thread.currentThread().getName(), Thread.currentThread().getId());
+        log.info("## SecurityContext : {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         if (request == null || deferredResult == null) {
             return;
         }
@@ -122,7 +126,7 @@ public class QueueingService {
 
     private void setJoinResult(DeferredResult<ChatResponse> result, ChatResponse response) {
         if (result != null) {
-            result.setResult(response);
+            result.setErrorResult(ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response));
         }
     }
 

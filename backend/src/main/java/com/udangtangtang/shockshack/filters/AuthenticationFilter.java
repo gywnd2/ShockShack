@@ -54,4 +54,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(new JwtDto(accessToken, refreshToken)));
     }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        super.unsuccessfulAuthentication(request, response, failed);
+        log.info("unsuccessful authentication");
+        String message = failed.getMessage();
+        log.info("{}",message);
+    }
 }
