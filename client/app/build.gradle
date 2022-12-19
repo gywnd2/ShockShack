@@ -21,6 +21,7 @@ android {
 
         buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", properties['web_client_id']
         buildConfigField "String", "SERVER_ADDRESS", properties['server_addr']
+        buildConfigField "String", "SERVER_IP", properties['server_ip']
     }
 
     buildTypes {
