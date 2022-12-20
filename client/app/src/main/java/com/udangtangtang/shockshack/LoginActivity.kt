@@ -17,7 +17,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityLoginBinding
-import com.udangtangtang.shockshack.model.normalLoginTokenModel
+import com.udangtangtang.shockshack.model.NormalLoginTokenModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -104,10 +104,10 @@ class LoginActivity : AppCompatActivity() {
                 // Request token to server
                 Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
                 // Request POST Google Idtoken to server
-                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<NormalLoginTokenModel> {
                     override fun onResponse(
-                        call: Call<normalLoginTokenModel>,
-                        response: Response<normalLoginTokenModel>
+                        call: Call<NormalLoginTokenModel>,
+                        response: Response<NormalLoginTokenModel>
                     ) {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
                         if (response.code().toString().equals("200")){
@@ -129,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
 
                     }
 
-                    override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
+                    override fun onFailure(call: Call<NormalLoginTokenModel>, t: Throwable) {
                         Log.d("Retrofit", "Token post failed : " + t.message.toString())
                         Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                     }
@@ -172,10 +172,10 @@ class LoginActivity : AppCompatActivity() {
             if(isEmailValid && isPasswordValid)
             {
                 // Request POST Google Idtoken to server
-                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<NormalLoginTokenModel> {
                     override fun onResponse(
-                        call: Call<normalLoginTokenModel>,
-                        response: Response<normalLoginTokenModel>
+                        call: Call<NormalLoginTokenModel>,
+                        response: Response<NormalLoginTokenModel>
                     ) {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
                         if (response.code().toString().equals("200")){
@@ -195,7 +195,7 @@ class LoginActivity : AppCompatActivity() {
                             Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
                         }
                     }
-                    override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
+                    override fun onFailure(call: Call<NormalLoginTokenModel>, t: Throwable) {
                         Log.d("Retrofit", "Token post failed : " + t.message.toString())
                         Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                     }

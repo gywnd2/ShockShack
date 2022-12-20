@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonObject
 import com.udangtangtang.shockshack.databinding.ActivityChatBinding
@@ -15,12 +16,14 @@ import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompHeader
 import ua.naiksoftware.stomp.dto.StompMessage
+import java.util.LinkedList
 
 class ChatActivity : AppCompatActivity() {
     private lateinit var binding:ActivityChatBinding
     private lateinit var stompClient:StompClient
     private lateinit var chatRoomId : String
     private lateinit var senderSessionId : String
+    private var messageList =LinkedList<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,12 @@ class ChatActivity : AppCompatActivity() {
         // Set title
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.title=getString(R.string.text_chat_title)
+
+        // Set message card layout
+        binding.textChatMainview.layoutManager=LinearLayoutManager(this)
+        messageList.add("1hello")
+        messageList.add("0thank you")
+        binding.textChatMainview.adapter=MessageCardAdapter(messageList)
 
         // If failed to receive chatroomid
         if(!intent.hasExtra("chatRoomId")){
@@ -42,7 +51,9 @@ class ChatActivity : AppCompatActivity() {
         // Send button action
         binding.buttonChatSend.setOnClickListener {
             runStomp()
-            binding.buttonChatSend.text=""
+
+            // show message
+
         }
 
     }

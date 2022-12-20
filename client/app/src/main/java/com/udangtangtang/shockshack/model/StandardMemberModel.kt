@@ -1,7 +1,6 @@
-import android.widget.EditText
 import com.google.gson.annotations.SerializedName
 
-data class standardMemberModel(
+data class StandardMemberModel(
     @SerializedName("email")
     val email: String,
 

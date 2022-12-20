@@ -3,21 +3,17 @@ package com.udangtangtang.shockshack
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
-import androidx.core.view.get
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
-import com.udangtangtang.shockshack.databinding.DrawerMainHeaderBinding
 import com.udangtangtang.shockshack.databinding.LayoutToolbarMainBinding
-import com.udangtangtang.shockshack.model.joinQueueResponseModel
+import com.udangtangtang.shockshack.model.JoinQueueResponseModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -133,8 +129,8 @@ class MainActivity : AppCompatActivity() {
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
-            service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<joinQueueResponseModel>{
-                override fun onResponse(call: Call<joinQueueResponseModel>, response: Response<joinQueueResponseModel>) {
+            service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<JoinQueueResponseModel>{
+                override fun onResponse(call: Call<JoinQueueResponseModel>, response: Response<JoinQueueResponseModel>) {
                     Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null")+"Response code : "+ response.code().toString())
                     // Enter chat room with chatroomid and sender session id
                     if (response.code().toString().equals("200")) { startActivity(Intent(applicationContext, ChatActivity::class.java)
@@ -145,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 // If there's no user to chat or connection failure
-                override fun onFailure(call: Call<joinQueueResponseModel>, t: Throwable) {
+                override fun onFailure(call: Call<JoinQueueResponseModel>, t: Throwable) {
                     Snackbar.make(binding.root, getString(R.string.text_main_enter_queue_failed), Snackbar.LENGTH_LONG).show()
                     Log.d("Retrofit", "Failed to enter queue : "+t.message.toString())
                 }

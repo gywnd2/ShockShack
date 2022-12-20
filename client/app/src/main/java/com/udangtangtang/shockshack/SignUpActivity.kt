@@ -1,24 +1,17 @@
 package com.udangtangtang.shockshack
 
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.util.Patterns
 import android.widget.Toast
-import android.widget.Toast.makeText
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivitySignUpBinding
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import standardMemberModel
-import java.util.regex.Pattern
+import StandardMemberModel
 
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding : ActivitySignUpBinding
@@ -61,7 +54,7 @@ class SignUpActivity : AppCompatActivity() {
             if(isEmailValid && isPasswordValid)
             {
                 // Create standard member model object to post
-                val member=standardMemberModel(binding.inputTextSignupEmail.text.toString(), binding.inputTextSignupPassword.text.toString())
+                val member=StandardMemberModel(binding.inputTextSignupEmail.text.toString(), binding.inputTextSignupPassword.text.toString())
 
                 // Log member info
                 Log.d("Retrofit", "Post new member to server \nemail : "+member.email+" password :"+member.password)

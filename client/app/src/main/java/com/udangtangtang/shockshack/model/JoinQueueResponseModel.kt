@@ -2,7 +2,7 @@ package com.udangtangtang.shockshack.model
 
 import com.google.gson.annotations.SerializedName
 
-data class joinQueueResponseModel (
+data class JoinQueueResponseModel (
     @SerializedName("responseResult")
     val res:String,
 
