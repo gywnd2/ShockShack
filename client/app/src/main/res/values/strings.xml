@@ -33,4 +33,5 @@
     <string name="text_main_enter_queue_failed">서버 연결에 실패하였습니다.</string>
     <string name="text_main_no_chat_user">상대를 찾을 수 없습니다.</string>
     <string name="text_chat_title">채팅</string>
+    <string name="text_main_anim_enter_queue">상대를 찾는 중 입니다.</string>
 </resources>

@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Button for test
         binding.testbutton.setOnClickListener {
-            startActivity(Intent(applicationContext, ChatActivity::class.java))
+            startActivity(Intent(applicationContext, MainActivity::class.java))
         }
 
         // Hide Action Bar

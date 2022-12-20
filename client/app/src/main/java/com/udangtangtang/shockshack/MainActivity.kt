@@ -1,11 +1,13 @@
 package com.udangtangtang.shockshack
 
+import android.animation.Animator
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
@@ -49,6 +51,9 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbarBinding.root)
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Hide entering queue anim at first
+        showQueueAnim(false)
 
         // NavigationView
         binding.navigationMain.setNavigationItemSelectedListener {
@@ -129,21 +134,30 @@ class MainActivity : AppCompatActivity() {
 
         // Enter chat queue button
         binding.buttonMainEnqueue.setOnClickListener {
+            // Entering queue animation
+            showQueueAnim(true)
+
             service.enterChatQueue("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<JoinQueueResponseModel>{
                 override fun onResponse(call: Call<JoinQueueResponseModel>, response: Response<JoinQueueResponseModel>) {
                     Log.d("Retrofit", "Entered queue : "+pref.getString(accountType, "Null")+"Response code : "+ response.code().toString())
                     // Enter chat room with chatroomid and sender session id
-                    if (response.code().toString().equals("200")) { startActivity(Intent(applicationContext, ChatActivity::class.java)
+                    if (response.code().toString().equals("200")) {
+                        startActivity(Intent(applicationContext, ChatActivity::class.java)
                         .putExtra("chatRoomId", response.body()?.roomId)
                         .putExtra("senderSessionId", response.body()?.sessionId)) }
                     else if (response.code().toString().equals("408")) { Snackbar.make(binding.root, getString(R.string.text_main_no_chat_user), Snackbar.LENGTH_LONG).show() }
                     else { Snackbar.make(binding.root, getString(R.string.text_main_enter_queue_failed), Snackbar.LENGTH_LONG).show() }
+
+                    // Stop animation
+                    showQueueAnim(false)
                 }
 
                 // If there's no user to chat or connection failure
                 override fun onFailure(call: Call<JoinQueueResponseModel>, t: Throwable) {
                     Snackbar.make(binding.root, getString(R.string.text_main_enter_queue_failed), Snackbar.LENGTH_LONG).show()
                     Log.d("Retrofit", "Failed to enter queue : "+t.message.toString())
+                    // Stop animation
+                    showQueueAnim(false)
                 }
 
             })
@@ -163,6 +177,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    fun showQueueAnim(state : Boolean){
+        if(state){
+            binding.containerMainAnimEnterQueue.visibility=View.VISIBLE
+            binding.animMainEnterQueue.animate().alpha(1.0f)
+            binding.animMainEnterQueue.playAnimation()
+        }else{
+            binding.animMainEnterQueue.pauseAnimation()
+            binding.animMainEnterQueue.animate().alpha(0.0f)
+            binding.containerMainAnimEnterQueue.visibility=View.INVISIBLE
+        }
     }
 
 }
