@@ -61,7 +61,7 @@ public class QueueingService {
     public void cancelChatRoom(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.sessionId()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.username()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -70,7 +70,7 @@ public class QueueingService {
     public void timeout(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.sessionId()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.username()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -94,8 +94,8 @@ public class QueueingService {
             DeferredResult<ChatResponse> user1Result = waitingUsers.remove(user1);
             DeferredResult<ChatResponse> user2Result = waitingUsers.remove(user2);
 
-            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.sessionId()));
-            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.sessionId()));
+            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.username()));
+            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.username()));
         } catch (Exception e) {
             log.warn("Exception occur while checking waiting users", e);
         } finally {
@@ -126,7 +126,11 @@ public class QueueingService {
 
     private void setJoinResult(DeferredResult<ChatResponse> result, ChatResponse response) {
         if (result != null) {
-            result.setErrorResult(ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response));
+            switch (response.getResponseResult()) {
+                case CANCEL -> result.setResult(response);
+                case TIMEOUT -> result.setErrorResult(ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response));
+                case DUPLICATED -> result.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+            }
         }
     }
 
