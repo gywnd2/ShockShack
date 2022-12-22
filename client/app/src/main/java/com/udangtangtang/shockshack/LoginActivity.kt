@@ -6,10 +6,13 @@ import android.content.IntentSender
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.security.keystore.KeyGenParameterSpec
 import android.util.Log
 import android.util.Patterns
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -40,10 +43,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var retrofit: Retrofit
     private lateinit var service : RetrofitService
 
+    private var backPressWaitTime:Long=0
+
     // SharedPreferences
     private lateinit var pref : SharedPreferences
-
-    private var backPressWaitTime:Long=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +61,13 @@ class LoginActivity : AppCompatActivity() {
         // Hide Action Bar
         supportActionBar?.hide()
 
-        // Get SharedPreferences handle
-        pref=this.getSharedPreferences(getString(R.string.pref_name_login), Context.MODE_PRIVATE)
+        // Get SharedPreferences
+        val KeyGenParameterSpec=MasterKeys.AES256_GCM_SPEC
+        val mainKeyAlias=MasterKeys.getOrCreate(KeyGenParameterSpec)
+
+        pref=EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
 
         // Init Retrofit
         retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)

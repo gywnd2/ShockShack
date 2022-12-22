@@ -12,6 +12,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GravityCompat
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
 import com.udangtangtang.shockshack.databinding.LayoutToolbarMainBinding
@@ -107,8 +109,13 @@ class MainActivity : AppCompatActivity() {
 
         // Consider logged in from google or normal
 
-        // Get SharedPreferences handle
-        pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
+        // Get SharedPreferences
+        val KeyGenParameterSpec= MasterKeys.AES256_GCM_SPEC
+        val mainKeyAlias= MasterKeys.getOrCreate(KeyGenParameterSpec)
+
+        pref = EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
 
         // Consider logged in from google or normal
         if(pref.getString(Google, "null").equals("null")){
