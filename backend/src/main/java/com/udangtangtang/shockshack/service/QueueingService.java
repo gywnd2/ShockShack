@@ -6,10 +6,13 @@ import com.udangtangtang.shockshack.domain.ChatResponse;
 import com.udangtangtang.shockshack.domain.ChatResponse.ResponseResult;
 import com.udangtangtang.shockshack.domain.MessageType;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -22,15 +25,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class QueueingService {
 
+    private final SimpMessagingTemplate messagingTemplate;
+
     private Map<ChatRequest, DeferredResult<ChatResponse>> waitingUsers;
-    // {key : websocket session id, value : chat room id}
     private Map<String, String> connectedUsers;
     private ReentrantReadWriteLock lock;
-
-    @Autowired
-    private SimpMessagingTemplate messagingTemplate;
 
     @PostConstruct
     private void setUp() {
@@ -42,6 +44,7 @@ public class QueueingService {
     @Async("asyncThreadPool")
     public void joinChatRoom(ChatRequest request, DeferredResult<ChatResponse> deferredResult) {
         log.info("## Join chat room request. {}[{}]", Thread.currentThread().getName(), Thread.currentThread().getId());
+        log.info("## SecurityContext : {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         if (request == null || deferredResult == null) {
             return;
         }
@@ -58,7 +61,7 @@ public class QueueingService {
     public void cancelChatRoom(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.sessionId()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.username()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -67,7 +70,7 @@ public class QueueingService {
     public void timeout(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.sessionId()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.username()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -75,7 +78,7 @@ public class QueueingService {
 
     public void establishChatRoom() {
         try {
-            log.debug("Current waiting users : " + waitingUsers.size());
+            log.info("Current waiting users : " + waitingUsers.size());
             lock.readLock().lock();
             if (waitingUsers.size() < 2) {
                 return;
@@ -84,14 +87,15 @@ public class QueueingService {
             Iterator<ChatRequest> itr = waitingUsers.keySet().iterator();
             ChatRequest user1 = itr.next();
             ChatRequest user2 = itr.next();
+            log.info("user1 : {}, user2 : {}", user1, user2);
 
             String uuid = UUID.randomUUID().toString();
 
             DeferredResult<ChatResponse> user1Result = waitingUsers.remove(user1);
             DeferredResult<ChatResponse> user2Result = waitingUsers.remove(user2);
 
-            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.sessionId()));
-            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.sessionId()));
+            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.username()));
+            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.username()));
         } catch (Exception e) {
             log.warn("Exception occur while checking waiting users", e);
         } finally {
@@ -117,12 +121,16 @@ public class QueueingService {
     }
 
     private String getDestination(String chatRoomId) {
-        return "/topic/chat/" + chatRoomId;
+        return "/topic/" + chatRoomId;
     }
 
     private void setJoinResult(DeferredResult<ChatResponse> result, ChatResponse response) {
         if (result != null) {
-            result.setResult(response);
+            switch (response.getResponseResult()) {
+                case CANCEL -> result.setResult(response);
+                case TIMEOUT -> result.setErrorResult(ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response));
+                case DUPLICATED -> result.setErrorResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+            }
         }
     }
 

@@ -4,12 +4,14 @@ package com.udangtangtang.shockshack.config;
 import com.udangtangtang.shockshack.filters.AuthenticationFilter;
 import com.udangtangtang.shockshack.filters.AuthorizationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -34,13 +36,18 @@ public class SecurityConfig {
                 .addFilterBefore(new AuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilter(authenticationFilter)
                 .authorizeHttpRequests()
-                    .requestMatchers("/api/v1/auth/**").permitAll()
-                    .anyRequest().authenticated();
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .anyRequest().permitAll();
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public InitializingBean initializingBean() {
+        return ()->SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 }
