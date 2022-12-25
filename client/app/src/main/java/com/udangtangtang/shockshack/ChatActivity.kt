@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -33,7 +34,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var inputManager : InputMethodManager
     private var messageList =LinkedList<String>()
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=ActivityChatBinding.inflate(layoutInflater)
@@ -47,6 +48,13 @@ class ChatActivity : AppCompatActivity() {
         binding.textChatMainview.layoutManager=LinearLayoutManager(this)
         binding.textChatMainview.adapter=MessageCardAdapter(messageList)
 
+        // Scroll recyclerview to end when keyboard shows
+        binding.textChatMainview.addOnLayoutChangeListener { view, _, _, _, bottom, _, _, _, oldBottom ->
+            if(bottom<oldBottom){
+                binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+            }
+        }
+
         // Hide keyboard
         inputManager= getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputManager.hideSoftInputFromWindow(this.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
@@ -55,6 +63,8 @@ class ChatActivity : AppCompatActivity() {
 
             if(action==EditorInfo.IME_ACTION_DONE){
                 inputManager.hideSoftInputFromWindow(binding.inputTextChatSendMessage.windowToken, 0)
+                // Scroll recyclerview to end
+                binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
                 handled=true
             }
 
@@ -93,7 +103,9 @@ class ChatActivity : AppCompatActivity() {
                 // Update recyclerview and clear input text view
                 (binding.textChatMainview.adapter as MessageCardAdapter).notifyDataSetChanged()
                 binding.inputTextChatSendMessage.text.clear()
-                inputManager.hideSoftInputFromWindow(this.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                // Scroll recyclerview to end
+                binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+//                inputManager.hideSoftInputFromWindow(this.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
 
             }
         }

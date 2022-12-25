@@ -7,7 +7,7 @@
     android:layout_marginTop="16dp">
 
     <TextView
-        android:id="@+id/text_item_chat_date_opposite"
+        android:id="@+id/text_item_chat_date_opponent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2022년 12월 19일"
@@ -24,16 +24,16 @@
         app:cardPreventCornerOverlap="false"
         app:cardUseCompatPadding="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_item_chat_date_opposite">
+        app:layout_constraintTop_toBottomOf="@id/text_item_chat_date_opponent">
 
         <LinearLayout
-            android:id="@+id/container_chat_item_opposite"
+            android:id="@+id/container_chat_item_opponent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/text_item_chat_message_opposite"
+                android:id="@+id/text_item_chat_message_opponent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
