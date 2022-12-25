@@ -97,6 +97,7 @@ class LoginActivity : AppCompatActivity() {
 
         if(binding.checkboxLoginAutologin.isChecked){
             val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+//            Log.d("Test", SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null")).toString())
             val tokenIssued=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
 
             val diff=(now.time-tokenIssued.time)

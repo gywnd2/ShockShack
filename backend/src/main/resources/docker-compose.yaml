@@ -12,7 +12,7 @@ services:
           limits:
             memory: 700m
       environment:
-        MYSQL_ROOT_PASSWORD: "dnekdxkdxkd"
+        MYSQL_ROOT_PASSWORD: "5440"
         MYSQL_DATABASE: chat
         MYSQL_USER: ymc
         MYSQL_PASSWORD: dnekdxkdxkd
