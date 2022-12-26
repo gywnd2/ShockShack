@@ -1,6 +1,7 @@
 package com.udangtangtang.shockshack
 
 import android.opengl.Visibility
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
     val chatStartDate : String=SimpleDateFormat("yyyy년 MM월 dd일").format(Date(System.currentTimeMillis()))
     val RECEIVED =0;
     val SENT=1;
+    val DISCONNECTED=2;
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if(viewType==RECEIVED){
@@ -28,8 +30,8 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
             return SentMessageHolder(view)
         }else{
             val view=LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.item_chat_user, viewGroup, false)
-            return SentMessageHolder(view)
+            .inflate(R.layout.item_chat_info, viewGroup, false)
+            return QuitInfoHolder(view)
         }
     }
 
@@ -39,12 +41,15 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
         if(holder.itemViewType==RECEIVED){
             holder as ReceivedMessageHolder
             holder.message.text=messageList[position].substring(1)
+
             // Show message date only if date changed
             if(chatStartDate.equals(nowDate)){
                 if (messageList.size==1){
                     holder.date.text=nowDate
                     holder.date.visibility=View.VISIBLE
                 }else{
+                    Log.d("datetest", "type : received"+position.toString()+"/"+messageList.size.toString())
+                    holder.date.text=nowDate
                     holder.date.visibility=View.INVISIBLE
                 }
             }else{
@@ -55,6 +60,7 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
         }else if(holder.itemViewType==SENT){
             holder as SentMessageHolder
             holder.message.text=messageList[position].substring(1)
+
             // Show message date only if date changed
             if(chatStartDate.equals(nowDate)){
                 if (messageList.size==1){
@@ -68,6 +74,8 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
                 holder.date.text=nowDate
                 holder.date.visibility=View.VISIBLE
             }
+        } else if(holder.itemViewType==DISCONNECTED){
+            holder as QuitInfoHolder
         }
     }
 
@@ -76,8 +84,10 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
     override fun getItemViewType(position: Int): Int {
         if (Character.getNumericValue(messageList[position][0])==RECEIVED){
             return RECEIVED
-        }else{
+        }else if(Character.getNumericValue(messageList[position][0])==SENT){
             return SENT
+        }else{
+            return DISCONNECTED
         }
     }
 
@@ -99,6 +109,14 @@ class MessageCardAdapter(private val messageList: LinkedList<String>) : Recycler
         init{
             message=view.findViewById(R.id.text_item_chat_message_opponent)
             date=view.findViewById(R.id.text_item_chat_date_opponent)
+        }
+    }
+
+    private class QuitInfoHolder(view: View) : RecyclerView.ViewHolder(view){
+        val message: TextView
+
+        init{
+            message=view.findViewById(R.id.text_item_chat_quit)
         }
     }
 

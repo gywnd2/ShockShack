@@ -1,7 +1,10 @@
 package com.udangtangtang.shockshack
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -9,6 +12,8 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -85,7 +90,7 @@ class ChatActivity : AppCompatActivity() {
 
         // Send button action
         binding.buttonChatSend.setOnClickListener {
-            if (!binding.inputTextChatSendMessage.text.equals("")){
+            if (!binding.inputTextChatSendMessage.text.isEmpty()){
                 //Add user input to message list
                 messageList.add("1"+binding.inputTextChatSendMessage.text)
 
@@ -101,7 +106,7 @@ class ChatActivity : AppCompatActivity() {
                 }.subscribe()
 
                 // Update recyclerview and clear input text view
-                (binding.textChatMainview.adapter as MessageCardAdapter).notifyDataSetChanged()
+                binding.textChatMainview.adapter?.notifyItemInserted((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
                 binding.inputTextChatSendMessage.text.clear()
                 // Scroll recyclerview to end
                 binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
@@ -111,6 +116,34 @@ class ChatActivity : AppCompatActivity() {
         }
 
     }
+
+    class ChatRoomExitDialogFragment : DialogFragment(){
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            return activity?.let{
+                val builder= AlertDialog.Builder(it)
+                builder.setMessage("정말 나가시겠습니까?")
+                    .setPositiveButton("예", DialogInterface.OnClickListener{dialog, id ->
+                        activity?.finish()
+                    })
+                    .setNegativeButton("아니오", DialogInterface.OnClickListener{dialog, id ->
+                        dialog.dismiss()
+                    })
+                builder.create()
+            }?:throw java.lang.IllegalStateException("Activity cannot be null")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stompClient.disconnect()
+    }
+
+    override fun onBackPressed() {
+        // Ask user to quit
+        val quitDialog=ChatRoomExitDialogFragment()
+        quitDialog.show(supportFragmentManager, "quit")
+    }
+
 
     @SuppressLint("CheckResult")
     fun runStomp(){
@@ -127,10 +160,26 @@ class ChatActivity : AppCompatActivity() {
             if (!receiveData.get("senderSessionId").equals(senderSessionId) && receiveData.get("messageType").equals("CHAT")) {
                 // Update recyclerview
                 runOnUiThread{
-                    binding.textChatMainview.adapter?.notifyDataSetChanged()
+                    binding.textChatMainview.adapter?.notifyItemInserted((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+                    binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
                 }
                 messageList.add("0" + receiveData.get("message").toString())
                 Log.d("StompLog", messageList.toString())
+            }
+            else if (receiveData.get("messageType").equals("DISCONNECTED")){
+                // Add disconnected message and notify
+                // scroll to end
+                messageList.add("2")
+                runOnUiThread {
+                    binding.textChatMainview.adapter?.notifyItemInserted((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+//                    binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+                    binding.textChatMainview.addOnLayoutChangeListener { view, _, _, _, bottom, _, _, _, oldBottom ->
+                        if(bottom<oldBottom){
+                            binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+                        }
+                    }
+                    binding.buttonChatSend.isEnabled=false
+                }
             }
         }
 

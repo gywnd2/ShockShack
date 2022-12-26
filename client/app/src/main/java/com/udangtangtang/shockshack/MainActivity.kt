@@ -183,7 +183,6 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         }
-
     }
 
     fun showQueueAnim(state : Boolean){
