@@ -172,12 +172,12 @@ class ChatActivity : AppCompatActivity() {
                 messageList.add("2")
                 runOnUiThread {
                     binding.textChatMainview.adapter?.notifyItemInserted((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
-//                    binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
-                    binding.textChatMainview.addOnLayoutChangeListener { view, _, _, _, bottom, _, _, _, oldBottom ->
-                        if(bottom<oldBottom){
-                            binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
-                        }
-                    }
+                    binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+//                    binding.textChatMainview.addOnLayoutChangeListener { view, _, _, _, bottom, _, _, _, oldBottom ->
+//                        if(bottom<oldBottom){
+//                            binding.textChatMainview.smoothScrollToPosition((binding.textChatMainview.adapter as MessageCardAdapter).itemCount)
+//                        }
+//                    }
                     binding.buttonChatSend.isEnabled=false
                 }
             }

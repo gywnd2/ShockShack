@@ -36,4 +36,6 @@
     <string name="text_main_anim_enter_queue">상대를 찾는 중 입니다.</string>
     <string name="text_pref_file_name">loginInfo</string>
     <string name="text_chat_info_quit">상대방이 나갔습니다.</string>
+    <string name="text_main_background">대화할 상대를 찾아보세요!</string>
+    <string name="text_drawer_header_welcome">환영합니다!</string>
 </resources>

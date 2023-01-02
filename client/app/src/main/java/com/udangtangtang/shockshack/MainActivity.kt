@@ -71,16 +71,8 @@ class MainActivity : AppCompatActivity() {
                     this.finish()
                     true
                 }
-                R.id.aa -> {
-                    Toast.makeText(applicationContext, "Menu 1", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.bb -> {
-                    Toast.makeText(applicationContext, "Menu 2", Toast.LENGTH_SHORT).show()
-                    true
-                }
-                R.id.cc -> {
-                    Toast.makeText(applicationContext, "Menu 3", Toast.LENGTH_SHORT).show()
+                R.id.menu_main_drawer_credit -> {
+//                    startActivity(Intent(applicationContext, ))
                     true
                 }
                 else -> {
@@ -130,13 +122,6 @@ class MainActivity : AppCompatActivity() {
         if (accountType==Google) {binding.navigationMain.getHeaderView(0).findViewById<TextView>(R.id.text_main_drawer_header_profile_usertype).text="Google Account"}
         else {binding.navigationMain.getHeaderView(0).findViewById<TextView>(R.id.text_main_drawer_header_profile_usertype).text="Normal Account"}
 
-        // Show test
-        with(pref.edit()){
-            binding.accessToken.text=pref.getString("accessToken","Null")
-            binding.refreshToken.text=pref.getString("refreshToken", "Null")
-            binding.googletoken.text=pref.getString("googleToken", "Null")
-            binding.email.text=pref.getString("tokenIssuedDateTime","Null")
-        }
         Snackbar.make(binding.root, "환영합니다 "+pref.getString("email", "Null")+" 님!", Snackbar.LENGTH_LONG).show()
 
         // Enter chat queue button

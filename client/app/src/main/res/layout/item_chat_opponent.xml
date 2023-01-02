@@ -36,6 +36,7 @@
                 android:id="@+id/text_item_chat_message_opponent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="20dp"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"
                 android:paddingLeft="12dp"
@@ -51,6 +52,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="10:19"
+        android:layout_marginLeft="10dp"
         app:layout_constraintBottom_toBottomOf="@id/card_chat_message_opposite"
         app:layout_constraintStart_toEndOf="@+id/card_chat_message_opposite"/>
 
