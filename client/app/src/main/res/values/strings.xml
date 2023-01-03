@@ -41,4 +41,5 @@
     <string name="text_main_current_user">현재 접속 중인</string>
     <string name="text_main_current_user_number">100명 중에서</string>
     <string name="text_main_current_user_if_connection_failed">다양한 사람들 중에서</string>
+    <string name="url_credit_readme_md">https://github.com/gywnd2/android-chat/blob/main/README.md</string>
 </resources>

@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.menu_main_drawer_credit -> {
-//                    startActivity(Intent(applicationContext, ))
+                    startActivity(Intent(applicationContext, Credit::class.java))
                     true
                 }
                 else -> {

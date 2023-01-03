@@ -6,4 +6,40 @@
     android:layout_height="match_parent"
     tools:context=".Credit">
 
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/layout_chat_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <include
+                android:id="@+id/toolbar_chat"
+                layout="@layout/layout_toolbar_main"/>
+
+
+            <WebView
+                android:id="@+id/webview_credit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        </LinearLayout>
+
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_credit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            app:headerLayout="@layout/drawer_main_header"
+            app:menu="@menu/drawer_main_navigation"
+            app:theme="@style/NavigationDrawerMenuItemStyle"
+            app:itemTextAppearance="@style/NavigationDrawerMenuItemStyle"
+            android:fitsSystemWindows="false"/>
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
