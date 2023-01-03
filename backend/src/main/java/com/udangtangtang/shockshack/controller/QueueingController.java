@@ -2,6 +2,7 @@ package com.udangtangtang.shockshack.controller;
 
 import com.udangtangtang.shockshack.domain.ChatRequest;
 import com.udangtangtang.shockshack.domain.ChatResponse;
+import com.udangtangtang.shockshack.dto.CurrentUsers;
 import com.udangtangtang.shockshack.service.QueueingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,13 @@ public class QueueingController {
         ChatRequest chatRequest = new ChatRequest(sessionId);
         queueingService.cancelChatRoom(chatRequest);
         return ResponseEntity.ok(chatRequest);
+    }
+
+    @PostMapping("/current")
+    public ResponseEntity<CurrentUsers> currentUsers() {
+        log.info("currentUsers");
+        log.info("{}", queueingService.getCurrentUsers());
+        return ResponseEntity.ok(new CurrentUsers(queueingService.getCurrentUsers()));
     }
 
 }
