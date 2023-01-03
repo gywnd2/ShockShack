@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +23,7 @@ import java.util.Date;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
 
@@ -30,7 +31,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String username = request.getParameter("email");
         String password = request.getParameter("password");
-        log.info("username : {}, password : {}", username, password);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
     }
@@ -53,13 +53,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .sign(algorithm);
 
         response.getWriter().write(new ObjectMapper().writeValueAsString(new JwtDto(accessToken, refreshToken)));
-    }
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        super.unsuccessfulAuthentication(request, response, failed);
-        log.info("unsuccessful authentication");
-        String message = failed.getMessage();
-        log.info("{}",message);
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     }
 }
