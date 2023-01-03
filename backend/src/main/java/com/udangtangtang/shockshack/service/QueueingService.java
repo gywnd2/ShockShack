@@ -48,7 +48,7 @@ public class QueueingService {
 
         try {
             lock.writeLock().lock();
-            waitingUsers.put(request, deferredResult);
+            waitingUsers.putIfAbsent(request, deferredResult);
         } finally {
             lock.writeLock().unlock();
             establishChatRoom();
@@ -58,7 +58,7 @@ public class QueueingService {
     public void cancelChatRoom(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.username()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.CANCEL, null, chatRequest.sessionId()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -67,7 +67,7 @@ public class QueueingService {
     public void timeout(ChatRequest chatRequest) {
         try {
             lock.writeLock().lock();
-            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.username()));
+            setJoinResult(waitingUsers.remove(chatRequest), new ChatResponse(ResponseResult.TIMEOUT, null, chatRequest.sessionId()));
         } finally {
             lock.writeLock().unlock();
         }
@@ -89,8 +89,8 @@ public class QueueingService {
             DeferredResult<ChatResponse> user1Result = waitingUsers.remove(user1);
             DeferredResult<ChatResponse> user2Result = waitingUsers.remove(user2);
 
-            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.username()));
-            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.username()));
+            user1Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user1.sessionId()));
+            user2Result.setResult(new ChatResponse(ResponseResult.SUCCESS, uuid, user2.sessionId()));
         } catch (Exception e) {
             log.warn("Exception occur while checking waiting users", e);
         } finally {
