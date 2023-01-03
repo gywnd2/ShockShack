@@ -134,4 +134,8 @@ public class QueueingService {
         }
     }
 
+    public int getCurrentUsers() {
+        return connectedUsers.size();
+    }
+
 }
