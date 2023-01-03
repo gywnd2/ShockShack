@@ -14,8 +14,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +30,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Slf4j
-public class AuthorizationFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class CustomAuthorizationFilter extends OncePerRequestFilter {
+
+    private final AuthenticationManager authenticationManager;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,11 +48,10 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     JWTVerifier verifier = JWT.require(algorithm).build();
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
-                    log.info("token received, username : {}", username);
                     ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                    UsernamePasswordAuthenticationToken authReq = new UsernamePasswordAuthenticationToken(username, "", authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authReq);
                     filterChain.doFilter(request, response);
                 } catch (AlgorithmMismatchException e) {
                     String token = authorization.substring("Bearer ".length());
@@ -63,14 +67,11 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                     if (idToken != null) {
                         GoogleIdToken.Payload payload = idToken.getPayload();
                         String email = payload.getEmail();
-                        log.info("id token received : {}", email);
                         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
                         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                         filterChain.doFilter(request, response);
                     }
                 } catch (JWTVerificationException e) {
-                    log.error("{}", e.getMessage());
-                    e.printStackTrace();
                     response.sendError(HttpServletResponse.SC_FORBIDDEN);
                 }
             } else {

@@ -32,8 +32,6 @@ public class WebSocketEventListener {
         String chatRoomId = ((List<String>) nativeHeaders.get("chatRoomId")).get(0);
         String sessionId = (String) generic.getHeaders().get("simpSessionId");
 
-        log.info("[Connected] room id : {} | websocket session id : {}", chatRoomId, sessionId);
-
         queueingService.connectUser(chatRoomId, sessionId);
     }
 
@@ -42,8 +40,6 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         String sessionId = headerAccessor.getSessionId();
-
-        log.info("[Disconnected] websocket session id : {}", sessionId);
 
         queueingService.disconnectUser(sessionId);
     }
