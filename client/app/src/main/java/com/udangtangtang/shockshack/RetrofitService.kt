@@ -1,7 +1,9 @@
 package com.udangtangtang.shockshack
 
-import com.udangtangtang.shockshack.model.normalLoginTokenModel
-import standardMemberModel
+import com.udangtangtang.shockshack.model.JoinQueueResponseModel
+import com.udangtangtang.shockshack.model.NormalLoginTokenModel
+import StandardMemberModel
+import com.udangtangtang.shockshack.model.CurrentUsersModel
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -10,12 +12,15 @@ interface RetrofitService {
     fun postGoogleIdToken(@Body idToken: String): Call<Void>
 
     @POST("api/v1/auth/registration")
-    fun postSignUpNewUser(@Body member: standardMemberModel): Call<Void>
+    fun postSignUpNewUser(@Body member: StandardMemberModel): Call<Void>
 
     @FormUrlEncoded
     @POST("api/v1/auth/login")
-    fun normalLogin(@Field("email") email:String, @Field("password") password:String): Call<normalLoginTokenModel>
+    fun normalLogin(@Field("email") email:String, @Field("password") password:String): Call<NormalLoginTokenModel>
 
     @POST("api/v1/queue/join")
-    fun enterChatQueue(@Header("Authorization") token : String):Call<Void>
+    fun enterChatQueue(@Header("Authorization") token : String):Call<JoinQueueResponseModel>
+
+    @POST("api/v1/queue/current")
+    fun getCurrentUsers():Call<CurrentUsersModel>
 }

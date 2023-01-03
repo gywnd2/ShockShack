@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.udangtangtang.shockshack"
-        minSdk 23
+        minSdk 24
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -21,6 +21,7 @@ android {
 
         buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", properties['web_client_id']
         buildConfigField "String", "SERVER_ADDRESS", properties['server_addr']
+        buildConfigField "String", "SERVER_IP", properties['server_ip']
     }
 
     buildTypes {
@@ -61,5 +62,27 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-scalars:2.6.0'
 
     // CircleImageView
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
+    // STOMP
+    // https://github.com/NaikSoftware/StompProtocolAndroid
+    implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6'
+
+    // Rx
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
+    // Lottie
+    implementation 'com.airbnb.android:lottie:5.2.0'
+
+    implementation "androidx.security:security-crypto:1.0.0"
+
+    // For Identity Credential APIs
+    implementation "androidx.security:security-identity-credential:1.0.0-alpha03"
+
+    // For App Authentication APIs
+    implementation "androidx.security:security-app-authenticator:1.0.0-alpha02"
+
+    // For App Authentication API testing
+    androidTestImplementation "androidx.security:security-app-authenticator:1.0.0-alpha01"
 }

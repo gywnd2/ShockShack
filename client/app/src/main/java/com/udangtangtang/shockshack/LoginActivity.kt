@@ -6,10 +6,13 @@ import android.content.IntentSender
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.security.keystore.KeyGenParameterSpec
 import android.util.Log
 import android.util.Patterns
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -17,14 +20,14 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityLoginBinding
-import com.udangtangtang.shockshack.databinding.ActivityMainBinding
-import com.udangtangtang.shockshack.model.normalLoginTokenModel
+import com.udangtangtang.shockshack.model.NormalLoginTokenModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import standardMemberModel
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding : ActivityLoginBinding
@@ -40,10 +43,10 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var retrofit: Retrofit
     private lateinit var service : RetrofitService
 
+    private var backPressWaitTime:Long=0
+
     // SharedPreferences
     private lateinit var pref : SharedPreferences
-
-    private var backPressWaitTime:Long=0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,14 +56,99 @@ class LoginActivity : AppCompatActivity() {
         // Hide Action Bar
         supportActionBar?.hide()
 
-        // Get SharedPreferences handle
-        pref=this.getSharedPreferences("loginInfo", Context.MODE_PRIVATE)
+        // Get SharedPreferences
+        val KeyGenParameterSpec=MasterKeys.AES256_GCM_SPEC
+        val mainKeyAlias=MasterKeys.getOrCreate(KeyGenParameterSpec)
+
+        pref=EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
 
         // Init Retrofit
         retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         service=retrofit.create(RetrofitService::class.java)
+
+        // Auto login checkbox
+        if(pref.getString(getString(R.string.pref_checkbox_autologin), "false").equals("false")){
+            binding.checkboxLoginAutologin.isChecked = false
+        }else{ binding.checkboxLoginAutologin.isChecked=true }
+
+        // Update value of sharedpreferences when checkbox changed
+        binding.checkboxLoginAutologin.setOnCheckedChangeListener{_,isChecked ->
+            if(isChecked) {
+                with(pref.edit()) {
+                    putString(getString(R.string.pref_checkbox_autologin), "true")
+                    apply()
+                }
+            }else{
+                with(pref.edit()) {
+                    putString(getString(R.string.pref_checkbox_autologin), "false")
+                    apply()
+                }
+            }
+        }
+
+        if(binding.checkboxLoginAutologin.isChecked){
+            val now=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+//            Log.d("Test", SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null")).toString())
+            val tokenIssued=SimpleDateFormat(getString(R.string.token_datetime_format)).parse(pref.getString("tokenIssuedDateTime", "null"))
+
+            val diff=(now.time-tokenIssued.time)
+            val diffDays=(diff/1000)/(24*60*60)
+            val diffHour=diff/(60*60*1000)
+
+            // Check accessToken first
+            if(diffDays>=1){
+                // User have to login again
+//                Toast.makeText(applicationContext, pref.getString(getString(R.string.pref_token_issued_date), "null"), Toast.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, getString(R.string.text_login_session_expired), Snackbar.LENGTH_LONG).show()
+            }else if (diffHour>=1){
+                // Request token to server
+//                Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
+                // Request POST Google Idtoken to server
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<NormalLoginTokenModel> {
+                    override fun onResponse(
+                        call: Call<NormalLoginTokenModel>,
+                        response: Response<NormalLoginTokenModel>
+                    ) {
+                        Log.d("Retrofit", "Token posted with status "+response.code().toString())
+                        if (response.code().toString().equals("200")){
+                            // Store idToken to SharedPreferences
+                            with(pref.edit()){
+                                remove(getString(R.string.pref_token_google))
+                                putString(getString(R.string.pref_token_issued_date), SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString(getString(R.string.pref_token_normal_access), response.body()?.accessToken)
+                                putString(getString(R.string.pref_token_normal_refresh), response.body()?.refreshToken)
+                                putString(getString(R.string.pref_token_normal_email), binding.inputTextLoginEmail.text.toString())
+                                apply()
+                            }
+                            // Start mainActivity
+                            startActivity(Intent(applicationContext, MainActivity::class.java))
+                            finish()
+                        }else{
+                            Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
+                        }
+
+                    }
+
+                    override fun onFailure(call: Call<NormalLoginTokenModel>, t: Throwable) {
+                        Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                        Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
+                    }
+                })
+            }
+            else{
+                // Both tokens are valid
+//                Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
+                // Start mainActivity
+                startActivity(Intent(applicationContext, MainActivity::class.java))
+                finish()
+            }
+        }else{
+            // Login manually
+        }
 
         // Normal login Button
         binding.buttonLoginNormal.setOnClickListener {
@@ -88,19 +176,20 @@ class LoginActivity : AppCompatActivity() {
             if(isEmailValid && isPasswordValid)
             {
                 // Request POST Google Idtoken to server
-                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<normalLoginTokenModel> {
+                service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<NormalLoginTokenModel> {
                     override fun onResponse(
-                        call: Call<normalLoginTokenModel>,
-                        response: Response<normalLoginTokenModel>
+                        call: Call<NormalLoginTokenModel>,
+                        response: Response<NormalLoginTokenModel>
                     ) {
                         Log.d("Retrofit", "Token posted with status "+response.code().toString())
                         if (response.code().toString().equals("200")){
                             // Store idToken to SharedPreferences
                             with(pref.edit()){
-                                remove("googleToken")
-                                putString("accessToken", response.body()?.accessToken)
-                                putString("refreshToken", response.body()?.refreshToken)
-                                putString("email", binding.inputTextLoginEmail.text.toString())
+                                remove(getString(R.string.pref_token_google))
+                                putString(getString(R.string.pref_token_issued_date), SimpleDateFormat(getString(R.string.token_datetime_format)).format(Date(System.currentTimeMillis())))
+                                putString(getString(R.string.pref_token_normal_access), response.body()?.accessToken)
+                                putString(getString(R.string.pref_token_normal_refresh), response.body()?.refreshToken)
+                                putString(getString(R.string.pref_token_normal_email), binding.inputTextLoginEmail.text.toString())
                                 apply()
                             }
                             // Start mainActivity
@@ -109,11 +198,10 @@ class LoginActivity : AppCompatActivity() {
                         }else{
                             Snackbar.make(binding.root, getString(R.string.text_login_input_invalid), Snackbar.LENGTH_LONG).show()
                         }
-
                     }
-
-                    override fun onFailure(call: Call<normalLoginTokenModel>, t: Throwable) {
+                    override fun onFailure(call: Call<NormalLoginTokenModel>, t: Throwable) {
                         Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                        Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                     }
                 })
             }
@@ -187,10 +275,10 @@ class LoginActivity : AppCompatActivity() {
                                     if (response.code()==200 || response.code()==400){
                                         // Store idToken to SharedPreferences
                                         with(pref.edit()){
-                                            remove("accessToken")
-                                            remove("refreshToken")
-                                            putString("googleToken", idToken)
-                                            putString("email", username)
+                                            remove(getString(R.string.pref_token_normal_access))
+                                            remove(getString(R.string.pref_token_normal_refresh))
+                                            putString(getString(R.string.pref_token_google), idToken)
+                                            putString(getString(R.string.pref_token_normal_email), username)
                                             apply()
                                         }
                                         // Start mainActivity
@@ -205,6 +293,7 @@ class LoginActivity : AppCompatActivity() {
 
                                 override fun onFailure(call: Call<Void>, t: Throwable) {
                                     Log.d("Retrofit", "Token post failed : " + t.message.toString())
+                                    Snackbar.make(binding.root, getString(R.string.text_login_check_connection), Snackbar.LENGTH_LONG).show()
                                 }
                             })
                         }
