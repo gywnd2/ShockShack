@@ -1,3 +1,8 @@
 package com.udangtangtang.shockshack.model
 
-data class CurrentUsersModel()
+import com.google.gson.annotations.SerializedName
+
+data class CurrentUsersModel(
+    @SerializedName("count")
+    val count:String
+)

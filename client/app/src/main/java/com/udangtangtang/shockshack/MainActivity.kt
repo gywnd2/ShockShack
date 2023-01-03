@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.security.keystore.KeyGenParameterSpec
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
@@ -17,6 +18,7 @@ import androidx.security.crypto.MasterKeys
 import com.google.android.material.snackbar.Snackbar
 import com.udangtangtang.shockshack.databinding.ActivityMainBinding
 import com.udangtangtang.shockshack.databinding.LayoutToolbarMainBinding
+import com.udangtangtang.shockshack.model.CurrentUsersModel
 import com.udangtangtang.shockshack.model.JoinQueueResponseModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -54,6 +56,32 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        // Init Retrofit
+                retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        service=retrofit.create(RetrofitService::class.java)
+
+        // Show how many users on server currently
+        service.getCurrentUsers().enqueue(object : Callback<CurrentUsersModel> {
+            override fun onResponse(
+                call: Call<CurrentUsersModel>,
+                response: Response<CurrentUsersModel>
+            ) {
+                if(response.code().toString().equals("200")){
+                    binding.textMainCurrentUserNumber.text=response.body()?.count+"명 중에서"
+                }else{
+                    binding.textMainCurrentUserNumber.text=getString(R.string.text_main_current_user_if_connection_failed)
+                }
+            }
+
+            override fun onFailure(call: Call<CurrentUsersModel>, t: Throwable) {
+                binding.textMainCurrentUserNumber.text=getString(R.string.text_main_current_user_if_connection_failed)
+            }
+
+        })
+
+
         // Hide entering queue anim at first
         showQueueAnim(false)
 
@@ -90,12 +118,6 @@ class MainActivity : AppCompatActivity() {
         binding.navigationMain.getHeaderView(0).findViewById<ImageButton>(R.id.button_main_toolbar_close).setOnClickListener {
             binding.layoutMainDrawer.closeDrawer(GravityCompat.START)
         }
-
-        // Init Retrofit
-        retrofit = Retrofit.Builder().baseUrl(BuildConfig.SERVER_ADDRESS)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        service=retrofit.create(RetrofitService::class.java)
 
 
         // Consider logged in from google or normal

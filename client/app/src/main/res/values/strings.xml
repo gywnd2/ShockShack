@@ -38,4 +38,7 @@
     <string name="text_chat_info_quit">상대방이 나갔습니다.</string>
     <string name="text_main_background">대화할 상대를 찾아보세요!</string>
     <string name="text_drawer_header_welcome">환영합니다!</string>
+    <string name="text_main_current_user">현재 접속 중인</string>
+    <string name="text_main_current_user_number">100명 중에서</string>
+    <string name="text_main_current_user_if_connection_failed">다양한 사람들 중에서</string>
 </resources>

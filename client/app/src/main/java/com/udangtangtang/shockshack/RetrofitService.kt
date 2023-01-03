@@ -3,6 +3,7 @@ package com.udangtangtang.shockshack
 import com.udangtangtang.shockshack.model.JoinQueueResponseModel
 import com.udangtangtang.shockshack.model.NormalLoginTokenModel
 import StandardMemberModel
+import com.udangtangtang.shockshack.model.CurrentUsersModel
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -19,4 +20,7 @@ interface RetrofitService {
 
     @POST("api/v1/queue/join")
     fun enterChatQueue(@Header("Authorization") token : String):Call<JoinQueueResponseModel>
+
+    @POST("api/v1/queue/current")
+    fun getCurrentUsers():Call<CurrentUsersModel>
 }
