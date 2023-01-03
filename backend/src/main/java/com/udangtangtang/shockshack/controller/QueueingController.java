@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,11 +24,11 @@ public class QueueingController {
     private final QueueingService queueingService;
 
     @PostMapping("/join")
-    public DeferredResult<ChatResponse> enter(HttpServletRequest request) {
+    public DeferredResult<ChatResponse> enter(HttpServletRequest request, Authentication authentication) {
         String sessionId = request.getSession().getId();
         DeferredResult<ChatResponse> joinResult = new DeferredResult<>(3000L);
 
-        ChatRequest chatRequest = new ChatRequest(sessionId);
+        ChatRequest chatRequest = new ChatRequest(sessionId, (String) authentication.getPrincipal());
         queueingService.joinChatRoom(chatRequest, joinResult);
 
         joinResult.onTimeout(()->{
@@ -38,9 +39,9 @@ public class QueueingController {
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<ChatRequest> cancel(HttpServletRequest request) {
+    public ResponseEntity<ChatRequest> cancel(HttpServletRequest request, Authentication authentication) {
         String sessionId = request.getSession().getId();
-        ChatRequest chatRequest = new ChatRequest(sessionId);
+        ChatRequest chatRequest = new ChatRequest(sessionId, (String) authentication.getPrincipal());
         queueingService.cancelChatRoom(chatRequest);
         return ResponseEntity.ok(chatRequest);
     }
