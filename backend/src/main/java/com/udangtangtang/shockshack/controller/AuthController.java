@@ -52,7 +52,6 @@ public class AuthController {
             if (idToken != null) {
                 GoogleIdToken.Payload payload = idToken.getPayload();
                 String email = payload.getEmail();
-                log.info("id token received : {}", email);
                 authService.register(new AuthDto(email, UUID.randomUUID().toString(), ApplicationUser.UserType.GOOGLE));
                 return new ResponseEntity<>(HttpStatus.OK);
             }
