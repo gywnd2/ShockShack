@@ -53,11 +53,6 @@ class LoginActivity : AppCompatActivity() {
         binding=ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Button for test
-        binding.testbutton.setOnClickListener {
-            startActivity(Intent(applicationContext, ChatActivity::class.java))
-        }
-
         // Hide Action Bar
         supportActionBar?.hide()
 
@@ -107,11 +102,11 @@ class LoginActivity : AppCompatActivity() {
             // Check accessToken first
             if(diffDays>=1){
                 // User have to login again
-                Toast.makeText(applicationContext, pref.getString(getString(R.string.pref_token_issued_date), "null"), Toast.LENGTH_SHORT).show()
+//                Toast.makeText(applicationContext, pref.getString(getString(R.string.pref_token_issued_date), "null"), Toast.LENGTH_SHORT).show()
                 Snackbar.make(binding.root, getString(R.string.text_login_session_expired), Snackbar.LENGTH_LONG).show()
             }else if (diffHour>=1){
                 // Request token to server
-                Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(applicationContext, "accessToken expired", Toast.LENGTH_SHORT).show()
                 // Request POST Google Idtoken to server
                 service.normalLogin(binding.inputTextLoginEmail.text.toString(), binding.inputTextLoginPassword.text.toString()).enqueue(object : Callback<NormalLoginTokenModel> {
                     override fun onResponse(
@@ -146,7 +141,7 @@ class LoginActivity : AppCompatActivity() {
             }
             else{
                 // Both tokens are valid
-                Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
+//                Toast.makeText(applicationContext, "Token valid", Toast.LENGTH_SHORT).show()
                 // Start mainActivity
                 startActivity(Intent(applicationContext, MainActivity::class.java))
                 finish()

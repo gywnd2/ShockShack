@@ -67,7 +67,6 @@ class MainActivity : AppCompatActivity() {
                         apply()
                     }
                     startActivity(Intent(applicationContext, LoginActivity::class.java))
-                    Toast.makeText(applicationContext, getString(R.string.text_main_logout), Toast.LENGTH_LONG).show()
                     this.finish()
                     true
                 }

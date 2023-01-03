@@ -59,7 +59,7 @@
             android:layout_height="match_parent"
             android:padding="20dp"
             android:hint="@string/text_chat_input_hint"
-            android:background="@drawable/textview_chat_background"/>
+            android:background="@drawable/edittext_background"/>
 
 
         <ImageView
