@@ -22,5 +22,5 @@ interface RetrofitService {
     fun enterChatQueue(@Header("Authorization") token : String):Call<JoinQueueResponseModel>
 
     @POST("api/v1/queue/current")
-    fun getCurrentUsers():Call<CurrentUsersModel>
+    fun getCurrentUsers(@Header("Authorization") token : String):Call<CurrentUsersModel>
 }
