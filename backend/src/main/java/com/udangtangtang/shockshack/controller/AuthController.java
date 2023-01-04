@@ -1,13 +1,10 @@
 package com.udangtangtang.shockshack.controller;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import com.udangtangtang.shockshack.domain.ApplicationUser;
 import com.udangtangtang.shockshack.dto.AuthDto;
 import com.udangtangtang.shockshack.dto.TokenDto;
 import com.udangtangtang.shockshack.service.interfaces.AuthService;
+import com.udangtangtang.shockshack.utils.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -29,6 +25,7 @@ import java.util.UUID;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtTokenVerifier verifier;
 
     @PostMapping("/registration")
     public ResponseEntity<String> registration(@RequestBody AuthDto dto) {
@@ -44,18 +41,11 @@ public class AuthController {
     @PostMapping("/registration/google")
     public ResponseEntity<Void> validateIdToken(@RequestBody TokenDto dto) throws GeneralSecurityException, IOException {
         try {
+            log.info("registration with google");
             String idTokenString = dto.getIdToken();
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), GsonFactory.getDefaultInstance())
-                    .setAudience(List.of("171803808918-qnc80jkj9s0gehsj273rhns3l8btvqrd.apps.googleusercontent.com"))
-                    .build();
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) {
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String email = payload.getEmail();
-                authService.register(new AuthDto(email, UUID.randomUUID().toString(), ApplicationUser.UserType.GOOGLE));
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            String username = verifier.verifyGoogleTokenAndGetUsername(idTokenString);
+            authService.register(new AuthDto(username, UUID.randomUUID().toString(), ApplicationUser.UserType.GOOGLE));
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

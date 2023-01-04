@@ -103,16 +103,23 @@ public class QueueingService {
         messagingTemplate.convertAndSend(destination, chatMessage);
     }
 
-    public void connectUser(String chatRoomId, String websocketSessionId) {
-        connectedUsers.put(websocketSessionId, chatRoomId);
+    public void connectUser(String chatRoomId, String sessionId) {
+        connectedUsers.put(sessionId, chatRoomId);
     }
 
-    public void disconnectUser(String websocketSessionId) {
-        String chatRoomId = connectedUsers.get(websocketSessionId);
-        ChatMessage chatMessage = new ChatMessage();
+    public void disconnectUser(String sessionId) {
+        try{
+            lock.writeLock().lock();
+            String chatRoomId = connectedUsers.remove(sessionId);
+            ChatMessage chatMessage = new ChatMessage();
 
-        chatMessage.setMessageType(MessageType.DISCONNECTED);
-        sendMessage(chatRoomId, chatMessage);
+            chatMessage.setMessageType(MessageType.DISCONNECTED);
+            sendMessage(chatRoomId, chatMessage);
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+
     }
 
     private String getDestination(String chatRoomId) {
