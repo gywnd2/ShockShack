@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,8 @@ import androidx.core.view.GravityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -39,11 +42,34 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var inputManager : InputMethodManager
     private var messageList =LinkedList<String>()
 
+    private lateinit var pref : SharedPreferences
+    private lateinit var accountType : String
+    private val Google="googleToken"
+    private val Normal="accessToken"
+
     @SuppressLint("CheckResult", "NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
+        // TODO : get account type from sharedpreferences
+
         super.onCreate(savedInstanceState)
         binding=ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // Get SharedPreferences
+        val KeyGenParameterSpec= MasterKeys.AES256_GCM_SPEC
+        val mainKeyAlias= MasterKeys.getOrCreate(KeyGenParameterSpec)
+
+        pref = EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
+
+        // Consider logged in from google or normal
+        if(pref.getString(Google, "null").equals("null")){
+            supportActionBar?.setTitle("Normal Account")
+            accountType=Normal }
+        else{
+            supportActionBar?.setTitle("Google Account")
+            accountType=Google }
 
         // Set title
         supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -147,8 +173,10 @@ class ChatActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     fun runStomp(){
-        stompClient=Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://"+BuildConfig.SERVER_IP+"/chat-websocket")
+
+        stompClient=Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://"+BuildConfig.SERVER_IP+"/chat-websocket"+"?Authorization="+"Bearer "+pref.getString(accountType, "Null").toString())
         val headerList= arrayListOf<StompHeader>()
+//        headerList.add(StompHeader("Authorization", "Bearer "+pref.getString(accountType, "Null").toString()))
         headerList.add(StompHeader("chatRoomId", chatRoomId))
         stompClient.connect(headerList)
 

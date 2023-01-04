@@ -27,8 +27,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
-    // TODO : Encrypt SharedPreferences
-
     private lateinit var binding:ActivityMainBinding
     private lateinit var toolbarBinding:LayoutToolbarMainBinding
 
@@ -62,8 +60,25 @@ class MainActivity : AppCompatActivity() {
             .build()
         service=retrofit.create(RetrofitService::class.java)
 
+
+        // Get SharedPreferences
+        val KeyGenParameterSpec= MasterKeys.AES256_GCM_SPEC
+        val mainKeyAlias= MasterKeys.getOrCreate(KeyGenParameterSpec)
+
+        pref = EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
+
+        // Consider logged in from google or normal
+        if(pref.getString(Google, "null").equals("null")){
+            supportActionBar?.setTitle("Normal Account")
+            accountType=Normal }
+        else{
+            supportActionBar?.setTitle("Google Account")
+            accountType=Google }
+
         // Show how many users on server currently
-        service.getCurrentUsers().enqueue(object : Callback<CurrentUsersModel> {
+        service.getCurrentUsers("Bearer "+pref.getString(accountType, "Null").toString()).enqueue(object : Callback<CurrentUsersModel> {
             override fun onResponse(
                 call: Call<CurrentUsersModel>,
                 response: Response<CurrentUsersModel>
@@ -77,6 +92,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun onFailure(call: Call<CurrentUsersModel>, t: Throwable) {
                 binding.textMainCurrentUserNumber.text=getString(R.string.text_main_current_user_if_connection_failed)
+                Log.d("test", t.stackTraceToString())
             }
 
         })
@@ -119,25 +135,6 @@ class MainActivity : AppCompatActivity() {
             binding.layoutMainDrawer.closeDrawer(GravityCompat.START)
         }
 
-
-        // Consider logged in from google or normal
-
-        // Get SharedPreferences
-        val KeyGenParameterSpec= MasterKeys.AES256_GCM_SPEC
-        val mainKeyAlias= MasterKeys.getOrCreate(KeyGenParameterSpec)
-
-        pref = EncryptedSharedPreferences.create(getString(R.string.text_pref_file_name), mainKeyAlias, applicationContext,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM)
-
-        // Consider logged in from google or normal
-        if(pref.getString(Google, "null").equals("null")){
-            supportActionBar?.setTitle("Normal Account")
-            accountType=Normal }
-        else{
-            supportActionBar?.setTitle("Google Account")
-            accountType=Google }
-
         // Show Profile
         binding.navigationMain.getHeaderView(0).findViewById<TextView>(R.id.text_main_drawer_header_profile_email).text=pref.getString("email", "null")
         if (accountType==Google) {binding.navigationMain.getHeaderView(0).findViewById<TextView>(R.id.text_main_drawer_header_profile_usertype).text="Google Account"}
@@ -171,6 +168,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("Retrofit", "Failed to enter queue : "+t.message.toString())
                     // Stop animation
                     showQueueAnim(false)
+                    Log.d("test", t.stackTraceToString())
                 }
 
             })
