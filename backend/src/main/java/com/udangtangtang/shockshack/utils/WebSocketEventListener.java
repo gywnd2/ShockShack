@@ -38,9 +38,7 @@ public class WebSocketEventListener {
     @EventListener
     public void webSocketDisconnectedListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-
         String sessionId = headerAccessor.getSessionId();
-
         queueingService.disconnectUser(sessionId);
     }
 

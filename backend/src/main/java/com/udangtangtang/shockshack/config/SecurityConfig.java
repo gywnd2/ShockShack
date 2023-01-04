@@ -3,6 +3,7 @@ package com.udangtangtang.shockshack.config;
 
 import com.udangtangtang.shockshack.filters.CustomAuthenticationFilter;
 import com.udangtangtang.shockshack.filters.CustomAuthorizationFilter;
+import com.udangtangtang.shockshack.utils.JwtTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtTokenVerifier verifier;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -32,9 +34,9 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .addFilter(customAuthenticationFilter)
-                .addFilterBefore(new CustomAuthorizationFilter(authenticationConfiguration.getAuthenticationManager()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomAuthorizationFilter(verifier), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/auth/**", "/chat-websocket").permitAll()
                 .anyRequest().authenticated();
         return http.build();
     }

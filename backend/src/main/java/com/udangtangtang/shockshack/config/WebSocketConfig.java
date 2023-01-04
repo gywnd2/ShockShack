@@ -20,4 +20,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/chat-websocket")
                 .setAllowedOriginPatterns("*");
     }
+
 }
