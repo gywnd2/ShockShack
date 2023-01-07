@@ -1,5 +1,5 @@
 # Shock Shack
-## Spring Websocket과 STOMP를 사용한 Android 랜덤 채팅 앱
+### Spring Websocket과 STOMP를 사용한 Android 랜덤 채팅 앱
 
     Android Studio Dolphin(Kotlin)
     Amazon AWS EC2
