@@ -16,13 +16,13 @@ Spring Websocket과 STOMP를 사용한 Android 랜덤 채팅 앱
 <br><br>
  # Screenshots
 
-| 로그인 | 회원가입 | 메인화면 |
-|:---:|:---:|:---:|
-|  ![login](/img/login.png) ![google](/img/google%20signin.png) | ![signup](/img/signup.png) |  ![main](/img/main.png) ![drawer](/img/drawer.png) |
+| 로그인 | 구글 로그인 | 회원가입 | 메인화면 |
+|:---:|:---:|:---:|:---:|
+|  ![login](/img/login.png) | ![google](/img/google%20signin.png) | ![signup](/img/signup.png) |  ![main](/img/main.png) ![drawer](/img/drawer.png) |
 
-| 상대 찾기 | 채팅 | 나가기 |
-|:---:|:---:|:---:|
-| ![enqueue](/img/enqueue.png) |  ![chat](/img/chat.png) ![opponent_left](/img/opponent_left.png) | ![exit](/img/exit.png) |
+| 상대 찾기 | 채팅 | 대화 종료 | 나가기 |
+|:---:|:---:|:---:|:---:|
+| ![enqueue](/img/enqueue.png) |  ![chat](/img/chat.png) | ![opponent_left](/img/opponent_left.png) | ![exit](/img/exit.png) |
 
 
 <br><br>
