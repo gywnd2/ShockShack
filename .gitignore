@@ -10,6 +10,8 @@ gradle-app.setting
 /.tmp
 /daemon
 
+application.properties
+
 *.iml
 /local.properties
 /.idea/caches
