@@ -4,6 +4,8 @@
     Android Studio Dolphin(Kotlin)
     Amazon AWS EC2
     Spring Boot
+    MySQL
+
 ## 1. 회원 기능
  - SNS 로그인
  - 회원 가입
